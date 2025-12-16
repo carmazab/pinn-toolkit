@@ -1,0 +1,3 @@
+add_subdirectory(executables)
+add_subdirectory(numalg)
+add_subdirectory(systems)
