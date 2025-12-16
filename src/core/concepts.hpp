@@ -8,7 +8,7 @@ namespace core {
 template <class T>
 concept RealLike = std::floating_point<T>;
 
-template <typename S>
+template <class S>
 concept StateLike = requires(S s, const S cs, index_t i) {
   { S::dof } -> std::convertible_to<index_t>;
 

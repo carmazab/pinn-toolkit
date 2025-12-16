@@ -1,3 +1,5 @@
+#pragma once
+
 #include <array>
 
 #include "core/concepts.hpp"
@@ -42,12 +44,12 @@ struct State {
   static constexpr index_t dof = Dof;
 
   template <typename... Vars>
-  explicit State(Vars... vars) noexcept
+  constexpr explicit State(Vars... vars) noexcept
     requires(sizeof...(Vars) == Dof)
       : data_{vars...} {}
 
-  data_t& operator[](index_t index) noexcept { return data_[index]; }
-  const data_t& operator[](index_t index) const noexcept {
+  constexpr data_t& operator[](index_t index) noexcept { return data_[index]; }
+  constexpr const data_t& operator[](index_t index) const noexcept {
     return data_[index];
   }
 
@@ -56,17 +58,19 @@ struct State {
 };
 
 template <StateLike StateT>
-StateT operator+(const StateT& lhs, const StateT& rhs) noexcept {
+constexpr StateT operator+(const StateT& lhs, const StateT& rhs) noexcept {
   return detail::add(lhs, rhs);
 }
 
 template <StateLike StateT>
-StateT operator*(const StateT& lhs, typename StateT::data_t scalar) noexcept {
+constexpr StateT operator*(const StateT& lhs,
+                           typename StateT::data_t scalar) noexcept {
   return detail::multiply(lhs, scalar);
 }
 
 template <StateLike StateT>
-StateT operator*(typename StateT::data_t scalar, const StateT& rhs) noexcept {
+constexpr StateT operator*(typename StateT::data_t scalar,
+                           const StateT& rhs) noexcept {
   return detail::multiply(rhs, scalar);
 }
 }  // namespace core
