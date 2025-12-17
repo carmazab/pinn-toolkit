@@ -8,7 +8,7 @@ struct RungeKutta4 {
 
   template <class System>
   System::state_t update(double t, const System::state_t& state,
-                         const System& system) const noexcept {
+                         const System& system) const {
     using state_t = System::state_t;
 
     const state_t k1{system.dudt(t, state)};

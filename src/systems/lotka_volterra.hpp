@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath>
-#include <vector>
 
 #include "core/state.hpp"
 #include "core/types.hpp"
