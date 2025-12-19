@@ -1,1 +1,1 @@
-# Physics-informed Neural Network Lab
+# Physics-Informed Neural Network Tookit
