@@ -1,3 +1,5 @@
+#pragma once
+
 #include "core/concepts.hpp"
 #include "core/types.hpp"
 #include "framework/framework.hpp"
