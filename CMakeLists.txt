@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 project(pinn)
 
 find_package(Catch2 3.11 REQUIRED)
-find_package(HDF5 1.14.6 REQUIRED COMPONENTS CXX)
+find_package(HDF5 2.0 REQUIRED COMPONENTS CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(AddUnitTestExecutable)
