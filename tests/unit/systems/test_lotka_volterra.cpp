@@ -1,6 +1,5 @@
 #include <cmath>
 
-#include "core/types.hpp"
 #include "framework/check_equal.hpp"
 #include "systems/lotka_volterra.hpp"
 
