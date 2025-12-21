@@ -3,6 +3,7 @@ set(LIBRARY io)
 set(TEST_LIBRARY test_${LIBRARY})
 
 set(SOURCES
+  test_h5_writer.cpp
   test_observer.cpp
   )
 
