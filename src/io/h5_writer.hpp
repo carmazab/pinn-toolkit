@@ -114,29 +114,29 @@ struct H5Writer {
   }
 
   void write_time(double time) {
-    H5::DataSpace filespace{time_ds_.getSpace()};
     hsize_t start[time_rank]{size_};
     hsize_t count[time_rank]{1};
-    filespace.selectHyperslab(H5S_SELECT_SET, count, start);
-
+    time_filespace_ = time_ds_.getSpace();
+    time_filespace_.selectHyperslab(H5S_SELECT_SET, count, start);
     time_ds_.write(&time, H5::PredType::NATIVE_DOUBLE, time_memspace_,
-                   filespace);
+                   time_filespace_);
   }
 
   void write_state(const StateT& state) {
-    H5::DataSpace filespace{state_ds_.getSpace()};
     hsize_t start[state_rank]{size_, 0};
     hsize_t count[state_rank]{1, StateT::dof};
-    filespace.selectHyperslab(H5S_SELECT_SET, count, start);
-
+    state_filespace_ = state_ds_.getSpace();
+    state_filespace_.selectHyperslab(H5S_SELECT_SET, count, start);
     state_ds_.write(state.data(), H5::PredType::NATIVE_DOUBLE, state_memspace_,
-                    filespace);
+                    state_filespace_);
   }
 
   H5::H5File file_;
   H5::DataSet time_ds_;
+  H5::DataSpace time_filespace_;
   H5::DataSpace time_memspace_;
   H5::DataSet state_ds_;
+  H5::DataSpace state_filespace_;
   H5::DataSpace state_memspace_;
 
   hsize_t chunk_length_;
