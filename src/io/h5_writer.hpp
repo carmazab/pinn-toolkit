@@ -4,11 +4,11 @@
 
 #include <string>
 
-#include "core/concepts.hpp"
+#include "io/concepts.hpp"
 #include "io/h5_error_stack_silencer.hpp"
 
 namespace io {
-template <core::StateLike StateT>
+template <H5WritableState StateT>
 struct H5Writer {
   static constexpr hsize_t time_rank = 1;
   static constexpr hsize_t state_rank = 2;
