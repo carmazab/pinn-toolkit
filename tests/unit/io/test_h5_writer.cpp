@@ -18,12 +18,13 @@ void run_test_suite() {
       state_t{-0.14, -12.41, 1231.0, -0.99986}};
 
   const std::string filename{"h5_writer_test.h5"};
-  {
-    io::H5Writer<state_t> writer{filename};
-    for (core::index_t n{0}; n < times.size(); ++n) {
-      writer.append(times[n], states[n]);
-    }
+  io::H5Writer<state_t> writer{filename};
+  for (core::index_t n{0}; n < times.size(); ++n) {
+    writer.append(times[n], states[n]);
   }
+  writer.close();
+
+  const hsize_t size{writer.size()};
 
   H5::H5File file{filename, H5F_ACC_RDONLY};
 
@@ -32,9 +33,9 @@ void run_test_suite() {
   hsize_t time_dims_buffer[1];
   H5::DataSpace time_space{time_ds.getSpace()};
   time_space.getSimpleExtentDims(time_dims_buffer);
-  testing::check_equal(time_dims_buffer[0], hsize_t{times.size()});
+  testing::check_equal(time_dims_buffer[0], size);
 
-  std::vector<double> time_values_buffer(times.size());
+  std::vector<double> time_values_buffer(size);
   time_ds.read(time_values_buffer.data(), H5::PredType::NATIVE_DOUBLE);
   for (core::index_t n{0}; n < times.size(); ++n) {
     testing::check_equal_within(time_values_buffer[n], times[n]);
@@ -45,10 +46,10 @@ void run_test_suite() {
   hsize_t state_dims_buffer[2];
   H5::DataSpace state_space{state_ds.getSpace()};
   state_space.getSimpleExtentDims(state_dims_buffer);
-  testing::check_equal(state_dims_buffer[0], hsize_t{times.size()});
+  testing::check_equal(state_dims_buffer[0], size);
   testing::check_equal(state_dims_buffer[1], hsize_t{dof});
 
-  std::vector<double> state_values_buffer(times.size() * dof);
+  std::vector<double> state_values_buffer(size * dof);
   state_ds.read(state_values_buffer.data(), H5::PredType::NATIVE_DOUBLE);
   for (core::index_t n{0}; n < times.size(); ++n) {
     for (core::index_t j{0}; j < dof; ++j) {
