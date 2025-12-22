@@ -53,6 +53,10 @@ struct State {
     return data_[index];
   }
 
+  constexpr double* data() noexcept { return data_.data(); }
+
+  constexpr const double* data() const noexcept { return data_.data(); }
+
  protected:
   std::array<data_t, Dof> data_;
 };
