@@ -60,45 +60,29 @@ struct H5Writer {
 
  private:
   void create_time_dataset() {
-    const std::string name{"time"};
-    try {
-      // suppress expected output when opening dataset fails
-      HDF5ErrorStackSilencer silent;
-      time_ds_ = file_.openDataSet(name);
+    hsize_t dims[time_rank]{0};
+    hsize_t max_dims[time_rank]{H5S_UNLIMITED};
+    H5::DataSpace space{time_rank, dims, max_dims};
 
-    } catch (const H5::Exception&) {
-      hsize_t dims[time_rank]{0};
-      hsize_t max_dims[time_rank]{H5S_UNLIMITED};
-      H5::DataSpace space{time_rank, dims, max_dims};
+    H5::DSetCreatPropList plist;
+    hsize_t chunk[time_rank]{chunk_length_};
+    plist.setChunk(time_rank, chunk);
 
-      H5::DSetCreatPropList plist;
-      hsize_t chunk[time_rank]{chunk_length_};
-      plist.setChunk(time_rank, chunk);
-
-      time_ds_ =
-          file_.createDataSet(name, H5::PredType::NATIVE_DOUBLE, space, plist);
-    }
+    time_ds_ =
+        file_.createDataSet("time", H5::PredType::NATIVE_DOUBLE, space, plist);
   }
 
   void create_state_dataset() {
-    const std::string name{"state"};
-    try {
-      // suppress expected output when opening dataset fails
-      HDF5ErrorStackSilencer silent;
-      state_ds_ = file_.openDataSet(name);
+    hsize_t dims[state_rank]{0, 0};
+    hsize_t max_dims[state_rank]{H5S_UNLIMITED, StateT::dof};
+    H5::DataSpace space{state_rank, dims, max_dims};
 
-    } catch (const H5::Exception&) {
-      hsize_t dims[state_rank]{0, 0};
-      hsize_t max_dims[state_rank]{H5S_UNLIMITED, StateT::dof};
-      H5::DataSpace space{state_rank, dims, max_dims};
+    H5::DSetCreatPropList plist;
+    hsize_t chunk[state_rank]{chunk_length_, StateT::dof};
+    plist.setChunk(state_rank, chunk);
 
-      H5::DSetCreatPropList plist;
-      hsize_t chunk[state_rank]{chunk_length_, StateT::dof};
-      plist.setChunk(state_rank, chunk);
-
-      state_ds_ =
-          file_.createDataSet(name, H5::PredType::NATIVE_DOUBLE, space, plist);
-    }
+    state_ds_ =
+        file_.createDataSet("state", H5::PredType::NATIVE_DOUBLE, space, plist);
   }
 
   void extend_data_if_needed() {
