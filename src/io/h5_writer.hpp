@@ -39,7 +39,7 @@ struct H5Writer {
   const hsize_t size() const { return size_; }
 
   void append(double time, const StateT& state) {
-    extend_data_if_needed(512);
+    extend_data_if_needed();
     write_time(time);
     write_state(state);
     ++size_;
@@ -101,9 +101,9 @@ struct H5Writer {
     }
   }
 
-  void extend_data_if_needed(hsize_t extend_by) {
+  void extend_data_if_needed() {
     if (size_ >= capacity_) {
-      capacity_ += extend_by;
+      capacity_ += chunk_length_;
 
       hsize_t time_size[1]{capacity_};
       time_ds_.extend(time_size);
