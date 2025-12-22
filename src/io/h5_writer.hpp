@@ -29,14 +29,14 @@ struct H5Writer {
     state_memspace_ = H5::DataSpace{state_rank, state_count};
   }
 
-  ~H5Writer() {
+  ~H5Writer() noexcept {
     try {
       close();
     } catch (...) {
     }
   }
 
-  const hsize_t size() const { return size_; }
+  hsize_t size() const { return size_; }
 
   void append(double time, const StateT& state) {
     extend_data_if_needed();
