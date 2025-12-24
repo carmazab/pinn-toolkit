@@ -18,7 +18,7 @@ struct ElasticPendulum {
         stiffness_{stiffness},
         length_{length} {}
 
-  state_t dudt(double t, const state_t& state) const {
+  state_t dudt(double time, const state_t& state) const {
     const double pth_over_m_r_r{state[3] / mass_ / state[0] / state[0]};
     return state_t{state[2] / mass_, pth_over_m_r_r,
                    pth_over_m_r_r * state[3] / state[0] -

@@ -14,7 +14,7 @@ struct LotkaVolterra {
   constexpr LotkaVolterra(double a, double b, double c, double d) noexcept
       : a_{a}, b_{b}, c_{c}, d_{d} {}
 
-  constexpr state_t dudt(double t, const state_t& state) const noexcept {
+  constexpr state_t dudt(double time, const state_t& state) const noexcept {
     return state_t{state[0] * (a_ - b_ * state[1]),
                    state[1] * (d_ * state[0] - c_)};
   }
