@@ -1,12 +1,29 @@
 #pragma once
 
+#include <string>
+
 namespace numalg {
 namespace timesteppers {
 struct RungeKutta4 {
+  struct Parameters {
+    struct StepSize {
+      using type = double;
+      type value;
+      static constexpr std::string name() { return "step_size"; }
+    } step_size;
+  };
+
+  static constexpr std::string name() { return "runge_kutta_4"; }
+
+  explicit RungeKutta4(const Parameters& params) noexcept
+      : RungeKutta4{params.step_size.value} {}
+
   explicit RungeKutta4(double step_size) noexcept
       : step_size_{step_size},
         half_step_{0.5 * step_size},
         step_sixths_{step_size / 6.0} {};
+
+  constexpr double step_size() const noexcept { return step_size_; }
 
   template <class System>
   System::state_t update(double time, const System::state_t& state,
@@ -23,6 +40,7 @@ struct RungeKutta4 {
 
  private:
   double step_size_;
+
   double half_step_;
   double step_sixths_;
 };

@@ -1,3 +1,5 @@
+#include <string>
+
 #include "core/types.hpp"
 #include "framework/check_equal.hpp"
 #include "numalg/testhelpers.hpp"
@@ -5,8 +7,10 @@
 
 namespace {
 void run_test_suite() {
+  using stepper_t = numalg::timesteppers::RungeKutta4;
+
   const double step_size{0.014};
-  numalg::timesteppers::RungeKutta4 stepper{step_size};
+  stepper_t stepper{step_size};
 
   using system_t = testhelpers::DummySystem;
   using state_t = system_t::state_t;
@@ -27,6 +31,13 @@ void run_test_suite() {
   }
 
   testing::check_equal_within(stepper.update(time, state, system), expected);
+
+  const stepper_t::Parameters params{step_size};
+  testing::check_equal(params.step_size.name(), std::string{"step_size"});
+  testing::check_equal_within(params.step_size.value, step_size);
+
+  stepper_t from_params{params};
+  testing::check_equal_within(from_params.step_size(), step_size);
 }
 }  // namespace
 
