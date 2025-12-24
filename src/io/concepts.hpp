@@ -6,6 +6,11 @@
 #include "core/concepts.hpp"
 
 namespace io {
+template <typename S>
+concept H5WritableState = core::StateLike<S> && requires(S s) {
+  { s.data() } -> std::same_as<typename S::data_t*>;
+} && std::is_standard_layout_v<S> && std::is_trivially_copyable_v<S>;
+
 template <typename O>
 concept OptionLike = requires(O o) {
   typename O::type;
@@ -18,10 +23,4 @@ concept WriterLike =
     core::StateLike<S> && requires(W w, typename S::data_t t, const S& s) {
       { w.append(t, s) } -> std::same_as<void>;
     };
-
-template <class T>
-concept H5WritableState = core::StateLike<T> && requires(T s) {
-  { s.data() } -> std::same_as<typename T::data_t*>;
-} && std::is_standard_layout_v<T> && std::is_trivially_copyable_v<T>;
-
 }  // namespace io
