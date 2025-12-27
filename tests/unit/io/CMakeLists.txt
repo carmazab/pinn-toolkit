@@ -1,19 +1,8 @@
-set(LIBRARY io)
-
-set(TEST_LIBRARY test_${LIBRARY})
-
-set(SOURCES
+add_unit_test_executable(
+  io
+  SOURCES
   test_h5_writer.cpp
   test_observer.cpp
-  )
-
-add_unit_test_executable(
-  ${TEST_LIBRARY}
-  "${SOURCES}"
-  )
-
-target_link_libraries(
-  ${TEST_LIBRARY}
-  PRIVATE
-  ${LIBRARY}
-  )
+  DEPENDENCIES
+  core
+)
