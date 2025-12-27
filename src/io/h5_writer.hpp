@@ -4,12 +4,17 @@
 
 #include <string>
 
-#include "io/concepts.hpp"
-#include "io/h5_error_stack_silencer.hpp"
+#include "core/concepts.hpp"
+#include "core/types.hpp"
 
 namespace io {
-template <H5WritableState StateT>
+template <core::concepts::State StateT>
 struct H5Writer {
+  using state_t = StateT;
+  using data_t = state_t::data_t;
+
+  static constexpr core::index_t dof = state_t::dof;
+
   static constexpr hsize_t time_rank = 1;
   static constexpr hsize_t state_rank = 2;
 
@@ -25,7 +30,7 @@ struct H5Writer {
     hsize_t time_count[time_rank]{1};
     time_memspace_ = H5::DataSpace{time_rank, time_count};
 
-    hsize_t state_count[state_rank]{1, StateT::dof};
+    hsize_t state_count[state_rank]{1, dof};
     state_memspace_ = H5::DataSpace{state_rank, state_count};
   }
 
@@ -38,7 +43,7 @@ struct H5Writer {
 
   hsize_t size() const { return size_; }
 
-  void append(double time, const StateT& state) {
+  void append(data_t time, const state_t& state) {
     extend_data_if_needed();
     write_time(time);
     write_state(state);
@@ -50,7 +55,7 @@ struct H5Writer {
       hsize_t time_size[1] = {size_};
       time_ds_.extend(time_size);
 
-      hsize_t state_size[2] = {size_, StateT::dof};
+      hsize_t state_size[2] = {size_, dof};
       state_ds_.extend(state_size);
 
       file_.flush(H5F_SCOPE_GLOBAL);
@@ -74,11 +79,11 @@ struct H5Writer {
 
   void create_state_dataset() {
     hsize_t dims[state_rank]{0, 0};
-    hsize_t max_dims[state_rank]{H5S_UNLIMITED, StateT::dof};
+    hsize_t max_dims[state_rank]{H5S_UNLIMITED, dof};
     H5::DataSpace space{state_rank, dims, max_dims};
 
     H5::DSetCreatPropList plist;
-    hsize_t chunk[state_rank]{chunk_length_, StateT::dof};
+    hsize_t chunk[state_rank]{chunk_length_, dof};
     plist.setChunk(state_rank, chunk);
 
     state_ds_ =
@@ -92,12 +97,12 @@ struct H5Writer {
       hsize_t time_size[1]{capacity_};
       time_ds_.extend(time_size);
 
-      hsize_t state_size[2]{capacity_, StateT::dof};
+      hsize_t state_size[2]{capacity_, dof};
       state_ds_.extend(state_size);
     }
   }
 
-  void write_time(double time) {
+  void write_time(data_t time) {
     hsize_t start[time_rank]{size_};
     hsize_t count[time_rank]{1};
     time_filespace_ = time_ds_.getSpace();
@@ -106,9 +111,9 @@ struct H5Writer {
                    time_filespace_);
   }
 
-  void write_state(const StateT& state) {
+  void write_state(const state_t& state) {
     hsize_t start[state_rank]{size_, 0};
-    hsize_t count[state_rank]{1, StateT::dof};
+    hsize_t count[state_rank]{1, dof};
     state_filespace_ = state_ds_.getSpace();
     state_filespace_.selectHyperslab(H5S_SELECT_SET, count, start);
     state_ds_.write(state.data(), H5::PredType::NATIVE_DOUBLE, state_memspace_,

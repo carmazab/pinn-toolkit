@@ -7,19 +7,20 @@
 
 namespace {
 void run_test_suite() {
-  using stepper_t = numalg::timesteppers::RungeKutta4;
-
-  const double step_size{0.014};
-  stepper_t stepper{step_size};
-
   using system_t = testhelpers::DummySystem;
   using state_t = system_t::state_t;
+  using data_t = system_t::data_t;
   system_t system;
 
-  const double time{0.97};
+  using stepper_t = numalg::timesteppers::RungeKutta4<system_t>;
+
+  const data_t step_size{0.014};
+  stepper_t stepper{step_size};
+
+  const data_t time{0.97};
   state_t state{1.23, 3.21, 4.31, 5.13};
 
-  const double half_step{0.5 * step_size};
+  const data_t half_step{0.5 * step_size};
   const state_t k1{system.dudt(time, state)};
   const state_t k2{system.dudt(time + half_step, state + half_step * k1)};
   const state_t k3{system.dudt(time + half_step, state + half_step * k2)};

@@ -8,18 +8,19 @@
 namespace systems {
 struct ElasticPendulum {
   using state_t = core::State<4>;
+  using data_t = state_t::data_t;
 
   static constexpr core::index_t dof = state_t::dof;
 
-  constexpr ElasticPendulum(double mass, double gravity, double stiffness,
-                            double length) noexcept
+  constexpr ElasticPendulum(data_t mass, data_t gravity, data_t stiffness,
+                            data_t length) noexcept
       : mass_{mass},
         gravity_{gravity},
         stiffness_{stiffness},
         length_{length} {}
 
-  state_t dudt(double time, const state_t& state) const {
-    const double pth_over_m_r_r{state[3] / mass_ / state[0] / state[0]};
+  state_t dudt(data_t time, const state_t& state) const {
+    const data_t pth_over_m_r_r{state[3] / mass_ / state[0] / state[0]};
     return state_t{state[2] / mass_, pth_over_m_r_r,
                    pth_over_m_r_r * state[3] / state[0] -
                        stiffness_ * (state[0] - length_) +
@@ -27,7 +28,7 @@ struct ElasticPendulum {
                    -mass_ * gravity_ * state[0] * std::sin(state[1])};
   }
 
-  double hamiltonian(const state_t& state) const {
+  data_t hamiltonian(const state_t& state) const {
     return 0.5 * ((state[2] * state[2] +
                    state[3] * state[3] / state[0] / state[0]) /
                       mass_ +
@@ -36,9 +37,9 @@ struct ElasticPendulum {
   }
 
  private:
-  double mass_;
-  double gravity_;
-  double stiffness_;
-  double length_;
+  data_t mass_;
+  data_t gravity_;
+  data_t stiffness_;
+  data_t length_;
 };
 }  // namespace systems

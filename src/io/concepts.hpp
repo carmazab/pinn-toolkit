@@ -4,23 +4,31 @@
 #include <string>
 
 #include "core/concepts.hpp"
+#include "core/types.hpp"
 
 namespace io {
-template <typename S>
-concept H5WritableState = core::StateLike<S> && requires(S s) {
-  { s.data() } -> std::same_as<typename S::data_t*>;
-} && std::is_standard_layout_v<S> && std::is_trivially_copyable_v<S>;
-
-template <typename O>
-concept OptionLike = requires(O o) {
+namespace concepts {
+template <class O>
+concept Option = requires(O o) {
   typename O::type;
   { o.value } -> std::same_as<typename O::type&>;
+
   { O::name() } -> std::same_as<std::string>;
 };
 
-template <typename W, typename S>
-concept WriterLike =
-    core::StateLike<S> && requires(W w, typename S::data_t t, const S& s) {
+template <class W>
+concept Writer =
+    requires(W w, typename W::state_t::data_t t, const W::state_t& s) {
+      typename W::state_t;
+      requires core::concepts::State<typename W::state_t>;
+
+      typename W::data_t;
+      requires std::same_as<typename W::data_t, typename W::state_t::data_t>;
+
+      { W::dof } -> std::convertible_to<core::index_t>;
+
       { w.append(t, s) } -> std::same_as<void>;
+      { w.close() } -> std::same_as<void>;
     };
+}  // namespace concepts
 }  // namespace io

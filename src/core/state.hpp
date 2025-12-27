@@ -7,28 +7,28 @@
 
 namespace core {
 namespace detail {
-template <StateLike StateT>
+template <concepts::State StateT>
 constexpr void add(StateT& lhs, const StateT& rhs) noexcept {
   for (index_t j{0}; j < StateT::dof; ++j) {
     lhs[j] += rhs[j];
   }
 }
 
-template <StateLike StateT>
+template <concepts::State StateT>
 constexpr StateT add(const StateT& lhs, const StateT& rhs) noexcept {
   StateT out{lhs};
   add(out, rhs);
   return out;
 }
 
-template <StateLike StateT>
+template <concepts::State StateT>
 constexpr void multiply(StateT& lhs, typename StateT::data_t scalar) noexcept {
   for (index_t j{0}; j < StateT::dof; ++j) {
     lhs[j] *= scalar;
   }
 }
 
-template <StateLike StateT>
+template <concepts::State StateT>
 constexpr StateT multiply(const StateT& lhs,
                           typename StateT::data_t scalar) noexcept {
   StateT out{lhs};
@@ -54,25 +54,24 @@ struct State {
   }
 
   constexpr data_t* data() noexcept { return data_.data(); }
-
   constexpr const data_t* data() const noexcept { return data_.data(); }
 
- protected:
+ private:
   std::array<data_t, Dof> data_;
 };
 
-template <StateLike StateT>
+template <concepts::State StateT>
 constexpr StateT operator+(const StateT& lhs, const StateT& rhs) noexcept {
   return detail::add(lhs, rhs);
 }
 
-template <StateLike StateT>
+template <concepts::State StateT>
 constexpr StateT operator*(const StateT& lhs,
                            typename StateT::data_t scalar) noexcept {
   return detail::multiply(lhs, scalar);
 }
 
-template <StateLike StateT>
+template <concepts::State StateT>
 constexpr StateT operator*(typename StateT::data_t scalar,
                            const StateT& rhs) noexcept {
   return detail::multiply(rhs, scalar);

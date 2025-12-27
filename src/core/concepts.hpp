@@ -5,16 +5,22 @@
 #include "core/types.hpp"
 
 namespace core {
-template <class T>
-concept RealLike = std::floating_point<T>;
+namespace concepts {
+template <class R>
+concept Real = std::floating_point<R>;
 
 template <class S>
-concept StateLike = requires(S s, const S cs, index_t i) {
+concept State = requires(S s, const S cs, index_t index) {
+  typename S::data_t;
+  requires Real<typename S::data_t>;
+
   { S::dof } -> std::convertible_to<index_t>;
 
-  typename S::data_t;
-  requires RealLike<typename S::data_t>;
-  { s[i] } -> std::same_as<typename S::data_t&>;
-  { cs[i] } -> std::same_as<const typename S::data_t&>;
+  { s[index] } -> std::same_as<typename S::data_t&>;
+  { cs[index] } -> std::same_as<const typename S::data_t&>;
+
+  { s.data() } -> std::same_as<typename S::data_t*>;
+  { cs.data() } -> std::same_as<const typename S::data_t*>;
 };
+}  // namespace concepts
 }  // namespace core
