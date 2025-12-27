@@ -7,9 +7,3 @@ target_link_libraries(
   INTERFACE
   core
 )
-
-target_include_directories(
-  ${LIBRARY}
-  INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-)

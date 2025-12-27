@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Catch2 3.11 REQUIRED)
 find_package(HDF5 2.0 REQUIRED COMPONENTS CXX)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(AddUnitTestExecutable)
 
 add_subdirectory(src)

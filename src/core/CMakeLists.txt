@@ -2,8 +2,8 @@ set(LIBRARY core)
 
 add_library(${LIBRARY} INTERFACE)
 
-target_include_directories(
+target_link_libraries(
   ${LIBRARY}
   INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  pinn_headers
 )

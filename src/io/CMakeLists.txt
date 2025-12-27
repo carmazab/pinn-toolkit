@@ -8,9 +8,3 @@ target_link_libraries(
   core
   hdf5_cpp-shared
 )
-
-target_include_directories(
-  ${LIBRARY}
-  INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-)
