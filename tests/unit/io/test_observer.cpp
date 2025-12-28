@@ -1,15 +1,15 @@
 #include "core/types.hpp"
 #include "framework/check_equal.hpp"
+#include "framework/helpers.hpp"
 #include "io/observer.hpp"
-#include "io/testhelpers.hpp"
 
 namespace {
 void run_test_suite() {
   const core::index_t write_every{3};
-  testhelpers::DummyWriter writer;
+  testing::helpers::DummyWriter writer;
   io::Observer observer{writer, write_every};
 
-  using state_t = testhelpers::DummyWriter::state_t;
+  using state_t = testing::helpers::DummyWriter::state_t;
 
   double time{0.123};
   state_t state{0.1, 0.2, 0.3, 0.4};

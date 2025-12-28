@@ -1,12 +1,16 @@
 #pragma once
 
 #include <any>
+#include <array>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "core/state.hpp"
 #include "core/types.hpp"
 
-namespace testhelpers {
+namespace testing {
+namespace helpers {
 struct DummyNode {
   template <typename T>
   T as() const {
@@ -32,4 +36,24 @@ struct DummySystem {
                    state[2] - 4.0 * state[1] * state[0]};
   }
 };
-}  // namespace testhelpers
+
+struct DummyWriter {
+  using state_t = core::State<4>;
+  using data_t = state_t::data_t;
+
+  static constexpr core::index_t dof = state_t::dof;
+
+  std::vector<double> t;
+  std::array<std::vector<double>, dof> history;
+
+  void append(double time, const state_t& state) {
+    t.push_back(time);
+    for (core::index_t s{0}; s < dof; ++s) {
+      history[s].push_back(state[s]);
+    }
+  }
+
+  void close() const noexcept {}
+};
+}  // namespace helpers
+}  // namespace testing

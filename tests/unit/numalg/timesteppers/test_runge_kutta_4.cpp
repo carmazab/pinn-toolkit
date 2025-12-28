@@ -2,12 +2,12 @@
 
 #include "core/types.hpp"
 #include "framework/check_equal.hpp"
-#include "numalg/testhelpers.hpp"
+#include "framework/helpers.hpp"
 #include "numalg/timesteppers/runge_kutta_4.hpp"
 
 namespace {
 void run_test_suite() {
-  using system_t = testhelpers::DummySystem;
+  using system_t = testing::helpers::DummySystem;
   using state_t = system_t::state_t;
   using data_t = system_t::data_t;
   system_t system;

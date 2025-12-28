@@ -1,16 +1,15 @@
-#include <string>
-
 #include "framework/check_equal.hpp"
-#include "numalg/testhelpers.hpp"
+#include "framework/helpers.hpp"
 #include "numalg/timesteppers/runge_kutta_4.hpp"
 #include "numalg/timesteppers/traits.hpp"
 
 namespace {
 void run_test_suite() {
-  using stepper_t = numalg::timesteppers::RungeKutta4<testhelpers::DummySystem>;
+  using stepper_t =
+      numalg::timesteppers::RungeKutta4<testing::helpers::DummySystem>;
   numalg::timesteppers::Traits<stepper_t> traits;
 
-  testhelpers::DummyNode stepper;
+  testing::helpers::DummyNode stepper;
   stepper.children["name"].value = "runge_kutta_4";
   stepper.children["parameters"].children["step_size"].value = 0.123;
 
