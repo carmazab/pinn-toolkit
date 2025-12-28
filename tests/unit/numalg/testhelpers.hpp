@@ -1,9 +1,26 @@
 #pragma once
 
+#include <any>
+#include <unordered_map>
+
 #include "core/state.hpp"
 #include "core/types.hpp"
 
 namespace testhelpers {
+struct DummyNode {
+  template <typename T>
+  T as() const {
+    return std::any_cast<T>(value);
+  }
+
+  const DummyNode& operator[](const std::string& key) const {
+    return children.at(key);
+  }
+
+  std::unordered_map<std::string, DummyNode> children;
+  std::any value;
+};
+
 struct DummySystem {
   using state_t = core::State<4>;
   using data_t = state_t::data_t;
