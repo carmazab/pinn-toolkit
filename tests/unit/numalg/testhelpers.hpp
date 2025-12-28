@@ -13,7 +13,7 @@ struct DummyNode {
     return std::any_cast<T>(value);
   }
 
-  const DummyNode& operator[](const std::string& key) const {
+  DummyNode operator[](const std::string& key) const {
     return children.at(key);
   }
 

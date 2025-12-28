@@ -8,6 +8,11 @@
 
 namespace io {
 namespace concepts {
+template <class N>
+concept Node = requires(N n, const std::string& key) {
+  { n[key] };
+};
+
 template <class O>
 concept Option = requires(O o) {
   typename O::type;
