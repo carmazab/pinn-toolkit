@@ -6,8 +6,18 @@
 
 namespace testing {
 template <class T>
+void check_true(T a) {
+  CHECK(a);
+}
+
+template <class T>
+void check_false(T a) {
+  CHECK_FALSE(a);
+}
+
+template <class T>
 void check_equal(T a, T b) {
-  CHECK(a == b);
+  check_true(a == b);
 }
 
 template <core::concepts::Real R>
