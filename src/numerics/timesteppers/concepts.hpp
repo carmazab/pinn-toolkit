@@ -5,7 +5,7 @@
 
 #include "systems/concepts.hpp"
 
-namespace numalg {
+namespace numerics {
 namespace concepts {
 template <class T>
 concept TimeStepper =
@@ -23,4 +23,4 @@ concept TimeStepper =
       { t.update(time, state, system) } -> std::same_as<typename T::state_t>;
     };
 }  // namespace concepts
-}  // namespace numalg
+}  // namespace numerics

@@ -1,6 +1,6 @@
 #include "io/h5_writer.hpp"
 #include "io/observer.hpp"
-#include "numalg/timesteppers/runge_kutta_4.hpp"
+#include "numerics/timesteppers/runge_kutta_4.hpp"
 #include "systems/ode/lotka_volterra.hpp"
 
 int main() {
@@ -13,7 +13,7 @@ int main() {
   system_t::state_t state{0.5, 0.5};
 
   const double step_size{0.1};
-  numalg::timesteppers::RungeKutta4<system_t> stepper{step_size};
+  numerics::timesteppers::RungeKutta4<system_t> stepper{step_size};
 
   io::H5Writer<state_t> writer{"lotka_volterra.h5"};
   io::Observer observer{writer, 1};

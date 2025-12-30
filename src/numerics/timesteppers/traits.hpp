@@ -4,11 +4,11 @@
 #include <variant>
 
 #include "io/concepts.hpp"
-#include "numalg/timesteppers/concepts.hpp"
-#include "numalg/timesteppers/runge_kutta_4.hpp"
+#include "numerics/timesteppers/concepts.hpp"
+#include "numerics/timesteppers/runge_kutta_4.hpp"
 #include "systems/concepts.hpp"
 
-namespace numalg {
+namespace numerics {
 namespace timesteppers {
 template <concepts::TimeStepper StepperT>
 struct Traits;
@@ -30,4 +30,4 @@ using all_steppers = std::tuple<RungeKutta4<SystemT>>;
 template <systems::concepts::System SystemT>
 using any_stepper = std::variant<RungeKutta4<SystemT>>;
 }  // namespace timesteppers
-}  // namespace numalg
+}  // namespace numerics

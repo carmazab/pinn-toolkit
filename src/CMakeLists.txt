@@ -9,5 +9,5 @@ target_include_directories(
 add_subdirectory(core)
 add_subdirectory(executables)
 add_subdirectory(io)
-add_subdirectory(numalg)
+add_subdirectory(numerics)
 add_subdirectory(systems)

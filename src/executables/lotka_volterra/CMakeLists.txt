@@ -9,5 +9,5 @@ target_link_libraries(
   PRIVATE
   io
   systems_ode
-  numalg_timesteppers
+  numerics_timesteppers
 )

@@ -3,7 +3,7 @@
 #include "core/types.hpp"
 #include "framework/check_equal.hpp"
 #include "framework/helpers.hpp"
-#include "numalg/timesteppers/runge_kutta_4.hpp"
+#include "numerics/timesteppers/runge_kutta_4.hpp"
 
 namespace {
 void run_test_suite() {
@@ -12,7 +12,7 @@ void run_test_suite() {
   using data_t = system_t::data_t;
   system_t system;
 
-  using stepper_t = numalg::timesteppers::RungeKutta4<system_t>;
+  using stepper_t = numerics::timesteppers::RungeKutta4<system_t>;
 
   const data_t step_size{0.014};
   stepper_t stepper{step_size};
@@ -42,7 +42,7 @@ void run_test_suite() {
 }
 }  // namespace
 
-TEST_CASE("unit.numalg.timesteppers.runge_kutta_4",
-          "[unit][numalg][timesteppers]") {
+TEST_CASE("unit.numerics.timesteppers.runge_kutta_4",
+          "[unit][numerics][timesteppers]") {
   run_test_suite();
 }

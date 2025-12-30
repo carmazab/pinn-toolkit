@@ -1,4 +1,4 @@
-set(LIBRARY numalg_timesteppers)
+set(LIBRARY numerics_timesteppers)
 
 add_library(${LIBRARY}_concepts INTERFACE)
 

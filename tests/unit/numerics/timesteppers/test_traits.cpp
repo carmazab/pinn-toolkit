@@ -1,13 +1,13 @@
 #include "framework/check_equal.hpp"
 #include "framework/helpers.hpp"
-#include "numalg/timesteppers/runge_kutta_4.hpp"
-#include "numalg/timesteppers/traits.hpp"
+#include "numerics/timesteppers/runge_kutta_4.hpp"
+#include "numerics/timesteppers/traits.hpp"
 
 namespace {
 void run_test_suite() {
   using stepper_t =
-      numalg::timesteppers::RungeKutta4<testing::helpers::DummySystem>;
-  numalg::timesteppers::Traits<stepper_t> traits;
+      numerics::timesteppers::RungeKutta4<testing::helpers::DummySystem>;
+  numerics::timesteppers::Traits<stepper_t> traits;
 
   testing::helpers::DummyNode stepper;
   stepper.children["name"].value = "runge_kutta_4";
@@ -19,6 +19,7 @@ void run_test_suite() {
 }
 }  // namespace
 
-TEST_CASE("unit.numalg.timesteppers.traits", "[unit][numalg][timesteppers]") {
+TEST_CASE("unit.numerics.timesteppers.traits",
+          "[unit][numerics][timesteppers]") {
   run_test_suite();
 }

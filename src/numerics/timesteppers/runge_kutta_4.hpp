@@ -4,7 +4,7 @@
 
 #include "systems/concepts.hpp"
 
-namespace numalg {
+namespace numerics {
 namespace timesteppers {
 template <systems::concepts::System SystemT>
 struct RungeKutta4 {
@@ -49,4 +49,4 @@ struct RungeKutta4 {
   data_t step_sixths_;
 };
 }  // namespace timesteppers
-}  // namespace numalg
+}  // namespace numerics
