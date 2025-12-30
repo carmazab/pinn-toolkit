@@ -6,6 +6,7 @@
 #include "core/types.hpp"
 
 namespace systems {
+namespace ode {
 struct LotkaVolterra {
   using state_t = core::State<2>;
   using data_t = state_t::data_t;
@@ -31,4 +32,5 @@ struct LotkaVolterra {
   data_t c_;
   data_t d_;
 };
+}  // namespace ode
 }  // namespace systems

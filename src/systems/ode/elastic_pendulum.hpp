@@ -6,6 +6,7 @@
 #include "core/types.hpp"
 
 namespace systems {
+namespace ode {
 struct ElasticPendulum {
   using state_t = core::State<4>;
   using data_t = state_t::data_t;
@@ -42,4 +43,5 @@ struct ElasticPendulum {
   data_t stiffness_;
   data_t length_;
 };
+}  // namespace ode
 }  // namespace systems

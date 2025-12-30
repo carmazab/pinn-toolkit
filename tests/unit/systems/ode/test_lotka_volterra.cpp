@@ -1,11 +1,11 @@
 #include <cmath>
 
 #include "framework/check_equal.hpp"
-#include "systems/lotka_volterra.hpp"
+#include "systems/ode/lotka_volterra.hpp"
 
 namespace {
 void run_test_suite() {
-  using system_t = systems::LotkaVolterra;
+  using system_t = systems::ode::LotkaVolterra;
   using state_t = system_t::state_t;
 
   const double a{0.51}, b{0.65}, c{6.41}, d{0.763};
@@ -24,6 +24,6 @@ void run_test_suite() {
 }
 }  // namespace
 
-TEST_CASE("unit.systems.lotka_volterra", "[unit][systems]") {
+TEST_CASE("unit.systems.ode.lotka_volterra", "[unit][systems][ode]") {
   run_test_suite();
 }

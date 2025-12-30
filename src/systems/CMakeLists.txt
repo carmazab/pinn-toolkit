@@ -1,9 +1,11 @@
 set(LIBRARY systems)
 
-add_library(${LIBRARY} INTERFACE)
+add_library(${LIBRARY}_concepts INTERFACE)
 
 target_link_libraries(
-  ${LIBRARY}
+  ${LIBRARY}_concepts
   INTERFACE
   core
 )
+
+add_subdirectory(ode)

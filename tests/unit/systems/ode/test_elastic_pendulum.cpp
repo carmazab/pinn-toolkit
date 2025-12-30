@@ -1,11 +1,11 @@
 #include <cmath>
 
 #include "framework/check_equal.hpp"
-#include "systems/elastic_pendulum.hpp"
+#include "systems/ode/elastic_pendulum.hpp"
 
 namespace {
 void run_test_suite() {
-  using system_t = systems::ElasticPendulum;
+  using system_t = systems::ode::ElasticPendulum;
   using state_t = system_t::state_t;
 
   const double m{1.51}, g{9.123}, k{0.531}, l{0.98};
@@ -30,6 +30,6 @@ void run_test_suite() {
 }
 }  // namespace
 
-TEST_CASE("unit.systems.elastic_pendulum", "[unit][systems]") {
+TEST_CASE("unit.systems.ode.elastic_pendulum", "[unit][systems][ode]") {
   run_test_suite();
 }

@@ -1,5 +1,5 @@
 add_unit_test_executable(
-  timesteppers
+  numalg_timesteppers
   SOURCES
   test_runge_kutta_4.cpp
   test_traits.cpp

@@ -8,6 +8,6 @@ target_link_libraries(
   ${EXECUTABLE}
   PRIVATE
   io
-  systems
-  timesteppers
+  systems_ode
+  numalg_timesteppers
 )

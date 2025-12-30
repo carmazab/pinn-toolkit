@@ -1,10 +1,10 @@
 #include "io/h5_writer.hpp"
 #include "io/observer.hpp"
 #include "numalg/timesteppers/runge_kutta_4.hpp"
-#include "systems/lotka_volterra.hpp"
+#include "systems/ode/lotka_volterra.hpp"
 
 int main() {
-  using system_t = systems::LotkaVolterra;
+  using system_t = systems::ode::LotkaVolterra;
   using state_t = system_t::state_t;
 
   const system_t system{0.05, 0.01, 0.03, 0.005};
