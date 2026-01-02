@@ -1,9 +1,11 @@
 #include <string>
 
+#include "pinn/core/random/rng_state.hpp"
 #include "pinn/core/types.hpp"
 #include "pinn/numerics/timesteppers/runge_kutta_4.hpp"
 #include "testing/check_equal.hpp"
 #include "testing/helpers.hpp"
+#include "testing/random_seed.hpp"
 
 namespace {
 void run_test_suite() {
@@ -14,11 +16,15 @@ void run_test_suite() {
 
   using stepper_t = numerics::timesteppers::RungeKutta4<system_t>;
 
-  const data_t step_size{0.014};
+  core::random::RngState rng{testing::random_seed()};
+
+  const data_t mean{0.0}, stddev{3.0};
+  const data_t step_size{rng.normal(mean, stddev)};
   stepper_t stepper{step_size};
 
-  const data_t time{0.97};
-  state_t state{1.23, 3.21, 4.31, 5.13};
+  const data_t time{rng.normal(mean, stddev)};
+  state_t state{rng.normal(mean, stddev), rng.normal(mean, stddev),
+                rng.normal(mean, stddev), rng.normal(mean, stddev)};
 
   const data_t half_step{0.5 * step_size};
   const state_t k1{system.dudt(time, state)};

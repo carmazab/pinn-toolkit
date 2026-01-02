@@ -1,18 +1,25 @@
+#include "pinn/core/random/rng_state.hpp"
 #include "pinn/core/types.hpp"
 #include "pinn/io/observer.hpp"
 #include "testing/check_equal.hpp"
 #include "testing/helpers.hpp"
+#include "testing/random_seed.hpp"
 
 namespace {
 void run_test_suite() {
-  const core::index_t write_every{3};
+  core::random::RngState rng{testing::random_seed()};
+
+  const core::index_t write_every{rng.uniform_int<core::index_t>(1, 5)};
   testing::helpers::DummyWriter writer;
   io::Observer observer{writer, write_every};
 
   using state_t = testing::helpers::DummyWriter::state_t;
+  using data_t = state_t::data_t;
 
-  double time{0.123};
-  state_t state{0.1, 0.2, 0.3, 0.4};
+  const data_t mean{0.0}, stddev{3.0};
+  data_t time{rng.normal(mean, stddev)};
+  state_t state{rng.normal(mean, stddev), rng.normal(mean, stddev),
+                rng.normal(mean, stddev), rng.normal(mean, stddev)};
   observer(time, state, 0);
 
   testing::check_equal_within(writer.t.back(), time);
@@ -20,10 +27,10 @@ void run_test_suite() {
     testing::check_equal_within(writer.history[s].back(), state[s]);
   }
 
-  const core::index_t iters{24};
-  for (core::index_t n{0}; n < iters; ++n) {
-    state = 2.0 * state;
-    time += 0.1;
+  const core::index_t iters{rng.uniform_int<core::index_t>(10, 30)};
+  for (core::index_t n{1}; n < iters + 1; ++n) {
+    state = rng.normal(mean, stddev) * state;
+    time += rng.normal(mean, stddev);
     observer(time, state, n);
 
     if (n % write_every == 0) {
