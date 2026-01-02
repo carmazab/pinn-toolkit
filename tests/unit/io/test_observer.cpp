@@ -1,7 +1,7 @@
-#include "core/types.hpp"
-#include "framework/check_equal.hpp"
-#include "framework/helpers.hpp"
-#include "io/observer.hpp"
+#include "pinn/core/types.hpp"
+#include "pinn/io/observer.hpp"
+#include "testing/check_equal.hpp"
+#include "testing/helpers.hpp"
 
 namespace {
 void run_test_suite() {

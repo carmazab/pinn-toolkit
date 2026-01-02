@@ -3,7 +3,7 @@
 #include <concepts>
 #include <string>
 
-#include "systems/concepts.hpp"
+#include "pinn/systems/concepts.hpp"
 
 namespace numerics {
 namespace concepts {

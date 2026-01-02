@@ -2,8 +2,8 @@
 
 #include <cmath>
 
-#include "core/state.hpp"
-#include "core/types.hpp"
+#include "pinn/core/state.hpp"
+#include "pinn/core/types.hpp"
 
 namespace systems {
 namespace ode {

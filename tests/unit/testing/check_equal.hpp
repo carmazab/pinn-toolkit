@@ -1,8 +1,10 @@
 #pragma once
 
-#include "core/concepts.hpp"
-#include "core/types.hpp"
-#include "framework/framework.hpp"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+
+#include "pinn/core/concepts.hpp"
+#include "pinn/core/types.hpp"
 
 namespace testing {
 template <class T>

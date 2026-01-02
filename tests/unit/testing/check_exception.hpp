@@ -1,6 +1,6 @@
 #pragma once
 
-#include "framework/framework.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 namespace testing {
 template <class Exception, class F>

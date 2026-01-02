@@ -1,5 +1,5 @@
-#include "core/state.hpp"
-#include "framework/check_equal.hpp"
+#include "pinn/core/state.hpp"
+#include "testing/check_equal.hpp"
 
 namespace {
 void run_test_suite() {

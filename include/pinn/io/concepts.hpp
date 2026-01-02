@@ -3,8 +3,8 @@
 #include <concepts>
 #include <string>
 
-#include "core/concepts.hpp"
-#include "core/types.hpp"
+#include "pinn/core/concepts.hpp"
+#include "pinn/core/types.hpp"
 
 namespace io {
 namespace concepts {

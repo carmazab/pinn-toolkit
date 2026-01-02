@@ -1,15 +1,10 @@
-include(CTest)
-include(Catch)
-
-function(add_unit_test_executable LIBRARY)
-
-  set(TEST_LIBRARY test_${LIBRARY})
+function(add_unit_test_executable TEST_LIBRARY)
 
   cmake_parse_arguments(
     ARG
     ""
     ""
-    "SOURCES;DEPENDENCIES"
+    "SOURCES;LINK_LIBS"
     ${ARGN}
   )
 
@@ -21,6 +16,8 @@ function(add_unit_test_executable LIBRARY)
 
   add_executable(${TEST_LIBRARY})
 
+  target_compile_features(${TEST_LIBRARY} PRIVATE cxx_std_23)
+
   target_sources(
     ${TEST_LIBRARY}
     PRIVATE
@@ -30,9 +27,8 @@ function(add_unit_test_executable LIBRARY)
   target_link_libraries(
     ${TEST_LIBRARY}
     PRIVATE
-    ${LIBRARY}
     testing
-    ${ARG_DEPENDENCIES}
+    ${ARG_LINK_LIBS}
   )
 
   catch_discover_tests(${TEST_LIBRARY})

@@ -1,7 +1,7 @@
-#include "io/h5_writer.hpp"
-#include "io/observer.hpp"
-#include "numerics/timesteppers/runge_kutta_4.hpp"
-#include "systems/ode/lotka_volterra.hpp"
+#include "pinn/io/h5_writer.hpp"
+#include "pinn/io/observer.hpp"
+#include "pinn/numerics/timesteppers/runge_kutta_4.hpp"
+#include "pinn/systems/ode/lotka_volterra.hpp"
 
 int main() {
   using system_t = systems::ode::LotkaVolterra;

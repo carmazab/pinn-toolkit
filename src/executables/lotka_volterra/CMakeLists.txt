@@ -7,7 +7,5 @@ add_executable(${EXECUTABLE}
 target_link_libraries(
   ${EXECUTABLE}
   PRIVATE
-  io
-  systems_ode
-  numerics_timesteppers
+  pinn
 )

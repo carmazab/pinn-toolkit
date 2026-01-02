@@ -1,10 +1,10 @@
 #include <string>
 #include <vector>
 
-#include "core/state.hpp"
-#include "core/types.hpp"
-#include "framework/check_equal.hpp"
-#include "io/h5_writer.hpp"
+#include "pinn/core/state.hpp"
+#include "pinn/core/types.hpp"
+#include "pinn/io/h5_writer.hpp"
+#include "testing/check_equal.hpp"
 
 namespace {
 void run_test_suite() {

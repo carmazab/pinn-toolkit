@@ -2,7 +2,7 @@
 
 #include <concepts>
 
-#include "core/types.hpp"
+#include "pinn/core/types.hpp"
 
 namespace core {
 namespace concepts {

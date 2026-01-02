@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/types.hpp"
-#include "io/concepts.hpp"
+#include "pinn/core/types.hpp"
+#include "pinn/io/concepts.hpp"
 
 namespace io {
 template <io::concepts::Writer WriterT>

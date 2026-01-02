@@ -1,7 +1,7 @@
-#include "framework/check_equal.hpp"
-#include "framework/helpers.hpp"
-#include "numerics/timesteppers/runge_kutta_4.hpp"
-#include "numerics/timesteppers/traits.hpp"
+#include "pinn/numerics/timesteppers/runge_kutta_4.hpp"
+#include "pinn/numerics/timesteppers/traits.hpp"
+#include "testing/check_equal.hpp"
+#include "testing/helpers.hpp"
 
 namespace {
 void run_test_suite() {

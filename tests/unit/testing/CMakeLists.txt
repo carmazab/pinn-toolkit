@@ -5,8 +5,14 @@ add_library(${LIBRARY} INTERFACE)
 target_link_libraries(
   ${LIBRARY}
   INTERFACE
+  pinn
+)
+
+# externals
+target_link_libraries(
+  ${LIBRARY}
+  INTERFACE
   Catch2::Catch2WithMain
-  core
 )
 
 target_include_directories(

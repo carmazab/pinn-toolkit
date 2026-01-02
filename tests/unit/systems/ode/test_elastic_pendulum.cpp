@@ -1,7 +1,7 @@
 #include <cmath>
 
-#include "framework/check_equal.hpp"
-#include "systems/ode/elastic_pendulum.hpp"
+#include "pinn/systems/ode/elastic_pendulum.hpp"
+#include "testing/check_equal.hpp"
 
 namespace {
 void run_test_suite() {

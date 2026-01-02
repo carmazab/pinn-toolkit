@@ -3,10 +3,10 @@
 #include <tuple>
 #include <variant>
 
-#include "io/concepts.hpp"
-#include "numerics/concepts.hpp"
-#include "numerics/timesteppers/runge_kutta_4.hpp"
-#include "systems/concepts.hpp"
+#include "pinn/io/concepts.hpp"
+#include "pinn/numerics/concepts.hpp"
+#include "pinn/numerics/timesteppers/runge_kutta_4.hpp"
+#include "pinn/systems/concepts.hpp"
 
 namespace numerics {
 namespace timesteppers {
@@ -20,7 +20,7 @@ struct Traits<RungeKutta4<SystemT>> {
   template <io::concepts::Node NodeT>
   static RungeKutta4<SystemT>::Parameters read_parameters(const NodeT& params) {
     return params_t{params[params_t::StepSize::name()]
-                        .as<typename params_t::StepSize::type>()};
+                        .template as<typename params_t::StepSize::type>()};
   }
 };
 

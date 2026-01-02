@@ -1,8 +1,6 @@
 add_unit_test_executable(
-  io
+  test_io
   SOURCES
   test_h5_writer.cpp
   test_observer.cpp
-  DEPENDENCIES
-  core
 )

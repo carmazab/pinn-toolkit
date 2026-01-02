@@ -6,8 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "core/state.hpp"
-#include "core/types.hpp"
+#include "pinn/core/state.hpp"
+#include "pinn/core/types.hpp"
 
 namespace testing {
 namespace helpers {
