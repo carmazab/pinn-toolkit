@@ -6,6 +6,10 @@
 
 namespace core {
 namespace concepts {
+template <class I>
+concept Integer =
+    std::integral<I> && !std::same_as<I, bool> && !std::same_as<I, char>;
+
 template <class R>
 concept Real = std::floating_point<R>;
 
