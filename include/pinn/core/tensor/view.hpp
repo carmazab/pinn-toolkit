@@ -1,0 +1,57 @@
+#pragma once
+
+#include <array>
+
+#include "pinn/core/types.hpp"
+
+namespace core {
+namespace tensor {
+template <class DataT, index_t Rank>
+struct View {
+  static_assert(Rank > 0);
+
+  using data_t = DataT;
+  using indexer_t = std::array<index_t, Rank>;
+
+  data_t* data;
+  indexer_t extents;
+  indexer_t strides;
+
+  template <class... Indices>
+    requires(sizeof...(Indices) == Rank)
+  constexpr data_t& operator()(Indices... indices) const noexcept {
+    return operator()(indexer_t{static_cast<index_t>(indices)...});
+  }
+
+  constexpr data_t& operator()(const indexer_t& index) const noexcept {
+    index_t offset{0};
+    for (index_t j{0}; j < Rank; ++j) {
+      offset += index[j] * strides[j];
+    }
+    return data[offset];
+  }
+};
+
+namespace detail {
+template <class IndexerT>
+constexpr IndexerT strides_from_extents(const IndexerT& extents) noexcept {
+  IndexerT result;
+  result[0] = 1;
+  for (index_t j{0}; j < extents.size() - 1; ++j) {
+    result[j + 1] = extents[j] * result[j];
+  }
+  return result;
+}
+}  // namespace detail
+
+template <class DataT, index_t Rank>
+constexpr View<DataT, Rank> make_view(
+    DataT* data, const std::array<index_t, Rank>& extents) noexcept {
+  View<DataT, Rank> view{};
+  view.data = data;
+  view.extents = extents;
+  view.strides = detail::strides_from_extents(extents);
+  return view;
+}
+}  // namespace tensor
+}  // namespace core

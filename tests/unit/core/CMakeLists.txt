@@ -3,3 +3,5 @@ add_unit_test_executable(
   SOURCES
   test_state.cpp
 )
+
+add_subdirectory(tensor)
