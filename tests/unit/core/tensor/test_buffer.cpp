@@ -57,7 +57,12 @@ void test_construction_and_assignment() {
   testing::check_equal(buffer_3.data(), data_4);
 
   // Test self-move.
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wself-move"
   buffer_4 = std::move(buffer_4);
+#pragma clang diagnostic pop
+#endif
   testing::check_equal(buffer_4.size(), size_1);
   testing::check_equal(buffer_4.data(), data_1);
 
