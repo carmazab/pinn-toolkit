@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "pinn/core/tensor/buffer.hpp"
 #include "pinn/core/types.hpp"
 
 namespace core {
@@ -53,5 +54,21 @@ constexpr View<DataT, Rank> make_view(
   view.strides = detail::strides_from_extents(extents);
   return view;
 }
+
+template <class DataT, index_t Rank>
+constexpr View<DataT, Rank> make_view(
+    Buffer<DataT>& buffer, const std::array<index_t, Rank>& extents) noexcept {
+  return View<DataT, Rank>{buffer.data(), extents,
+                           detail::strides_from_extents(extents)};
+}
+
+template <class DataT, index_t Rank>
+constexpr View<const DataT, Rank> make_view(
+    const Buffer<DataT>& buffer,
+    const std::array<index_t, Rank>& extents) noexcept {
+  return View<const DataT, Rank>{buffer.data(), extents,
+                                 detail::strides_from_extents(extents)};
+}
+
 }  // namespace tensor
 }  // namespace core

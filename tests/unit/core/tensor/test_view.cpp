@@ -2,6 +2,7 @@
 #include <type_traits>
 
 #include "pinn/core/random/rng_state.hpp"
+#include "pinn/core/tensor/buffer.hpp"
 #include "pinn/core/tensor/view.hpp"
 #include "pinn/core/types.hpp"
 #include "testing/check_equal.hpp"
@@ -65,25 +66,32 @@ void test_construction_and_data_manipulation() {
 
 void test_const_correctness() {
   using writable = core::tensor::View<double, 3>;
-  using readonly = core::tensor::View<const double, 3>;
-
-  testing::check_true(
-      std::is_same_v<decltype(std::declval<writable>()(0, 0, 0)), double&>);
-  testing::check_true(
-      std::is_same_v<decltype(std::declval<readonly>()(0, 0, 0)),
-                     const double&>);
-
-  testing::check_true(
-      std::is_assignable_v<decltype(std::declval<writable>()(0, 0, 0)),
-                           double>);
-  testing::check_false(
-      std::is_assignable_v<decltype(std::declval<readonly>()(0, 0, 0)),
-                           double>);
+  using writable_access = decltype(std::declval<writable>()(0, 0, 0));
+  testing::check_true(std::is_same_v<writable_access, double&>);
+  testing::check_true(std::is_assignable_v<writable_access, double>);
 
   // const views *can* mutate underlying data by design.
   testing::check_true(
       std::is_assignable_v<decltype(std::declval<const writable>()(0, 0, 0)),
                            double>);
+
+  using readonly_access =
+      decltype(std::declval<core::tensor::View<const double, 3>>()(0, 0, 0));
+  testing::check_true(std::is_same_v<readonly_access, const double&>);
+  testing::check_false(std::is_assignable_v<readonly_access, double>);
+
+  // Check access of view constructed from buffer.
+  const std::array<core::index_t, 3> extents{2, 3, 4};
+
+  core::tensor::Buffer<double> buffer{6};
+  using access = decltype(core::tensor::make_view(buffer, extents)(0, 0, 0));
+  testing::check_true(std::is_same_v<access, double&>);
+  testing::check_true(std::is_assignable_v<access, double>);
+
+  const core::tensor::Buffer<double> cbuffer{6};
+  using caccess = decltype(core::tensor::make_view(cbuffer, extents)(0, 0, 0));
+  testing::check_true(std::is_same_v<caccess, const double&>);
+  testing::check_false(std::is_assignable_v<caccess, double>);
 }
 
 void test_copy_and_move_semantics() {
