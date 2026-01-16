@@ -31,6 +31,23 @@ struct View {
     }
     return data[offset];
   }
+
+  template <index_t Dim>
+  constexpr View<DataT, Rank - 1> slice(index_t index) const noexcept {
+    std::array<index_t, Rank - 1> subextents, substrides;
+
+    index_t idx{0};
+    for (index_t r{0}; r < Rank; ++r) {
+      if (r != Dim) {
+        subextents[idx] = extents[r];
+        substrides[idx] = strides[r];
+        ++idx;
+      }
+    }
+
+    return View<DataT, Rank - 1>{data + index * strides[Dim], subextents,
+                                 substrides};
+  }
 };
 
 namespace detail {

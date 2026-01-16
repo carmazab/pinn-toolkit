@@ -64,6 +64,107 @@ void test_construction_and_data_manipulation() {
   testing::check_equal_within(view(1, 2, 1, 4), random_value);
 }
 
+void test_slicing() {
+  using index_t = core::index_t;
+  constexpr index_t rank{4};
+  constexpr index_t ext_1{3}, ext_2{5}, ext_3{4}, ext_4{6};
+  constexpr index_t size{ext_1 * ext_2 * ext_3 * ext_4};
+  using indexer_t = std::array<index_t, rank>;
+
+  const double mean{0.0}, stddev{3.0};
+  core::random::RngState rng{testing::random_seed()};
+
+  double buffer[size];
+  for (index_t j{0}; j < size; ++j) {
+    buffer[j] = rng.normal(mean, stddev);
+  }
+
+  const indexer_t extents{ext_1, ext_2, ext_3, ext_4};
+  const auto view{core::tensor::make_view(buffer, extents)};
+
+  for (index_t slice_index{0}; slice_index < extents[0]; ++slice_index) {
+    const auto subview{view.slice<0>(slice_index)};
+
+    for (index_t j{0}; j < rank - 1; ++j) {
+      index_t k{j + (j >= 0)};
+      testing::check_equal(subview.extents[j], view.extents[k]);
+      testing::check_equal(subview.strides[j], view.strides[k]);
+    }
+
+    for (index_t j2{0}; j2 < ext_2; ++j2) {
+      for (index_t j3{0}; j3 < ext_3; ++j3) {
+        for (index_t j4{0}; j4 < ext_4; ++j4) {
+          testing::check_equal_within(subview(j2, j3, j4),
+                                      view(slice_index, j2, j3, j4));
+        }
+      }
+    }
+  }
+
+  for (index_t slice_index{0}; slice_index < extents[1]; ++slice_index) {
+    const auto subview{view.slice<1>(slice_index)};
+
+    for (index_t j{0}; j < rank - 1; ++j) {
+      index_t k{j + (j >= 1)};
+      testing::check_equal(subview.extents[j], view.extents[k]);
+      testing::check_equal(subview.strides[j], view.strides[k]);
+    }
+
+    for (index_t j1{0}; j1 < ext_1; ++j1) {
+      for (index_t j3{0}; j3 < ext_3; ++j3) {
+        for (index_t j4{0}; j4 < ext_4; ++j4) {
+          testing::check_equal_within(subview(j1, j3, j4),
+                                      view(j1, slice_index, j3, j4));
+        }
+      }
+    }
+  }
+
+  for (index_t slice_index{0}; slice_index < extents[2]; ++slice_index) {
+    const auto subview{view.slice<2>(slice_index)};
+
+    for (index_t j{0}; j < rank - 1; ++j) {
+      index_t k{j + (j >= 2)};
+      testing::check_equal(subview.extents[j], view.extents[k]);
+      testing::check_equal(subview.strides[j], view.strides[k]);
+    }
+
+    for (index_t j1{0}; j1 < ext_1; ++j1) {
+      for (index_t j2{0}; j2 < ext_2; ++j2) {
+        for (index_t j4{0}; j4 < ext_4; ++j4) {
+          testing::check_equal_within(subview(j1, j2, j4),
+                                      view(j1, j2, slice_index, j4));
+        }
+      }
+    }
+  }
+
+  for (index_t slice_index{0}; slice_index < extents[3]; ++slice_index) {
+    const auto subview{view.slice<3>(slice_index)};
+
+    for (index_t j{0}; j < rank - 1; ++j) {
+      index_t k{j + (j >= 3)};
+      testing::check_equal(subview.extents[j], view.extents[k]);
+      testing::check_equal(subview.strides[j], view.strides[k]);
+    }
+
+    for (index_t j1{0}; j1 < ext_1; ++j1) {
+      for (index_t j2{0}; j2 < ext_2; ++j2) {
+        for (index_t j3{0}; j3 < ext_3; ++j3) {
+          testing::check_equal_within(subview(j1, j2, j3),
+                                      view(j1, j2, j3, slice_index));
+        }
+      }
+    }
+  }
+
+  // Test no aliasing.
+  auto subview{view.slice<1>(2)};
+  const double random_value{rng.normal(mean, stddev)};
+  subview(1, 1, 1) = random_value;
+  testing::check_equal_within(view(1, 2, 1, 1), random_value);
+}
+
 void test_const_correctness() {
   using writable = core::tensor::View<double, 3>;
   using writable_access = decltype(std::declval<writable>()(0, 0, 0));
@@ -84,14 +185,27 @@ void test_const_correctness() {
   const std::array<core::index_t, 3> extents{2, 3, 4};
 
   core::tensor::Buffer<double> buffer{6};
-  using access = decltype(core::tensor::make_view(buffer, extents)(0, 0, 0));
+  auto view{core::tensor::make_view(buffer, extents)};
+  using access = decltype(view(0, 0, 0));
   testing::check_true(std::is_same_v<access, double&>);
   testing::check_true(std::is_assignable_v<access, double>);
 
   const core::tensor::Buffer<double> cbuffer{6};
-  using caccess = decltype(core::tensor::make_view(cbuffer, extents)(0, 0, 0));
+  auto cview{core::tensor::make_view(cbuffer, extents)};
+  using caccess = decltype(cview(0, 0, 0));
   testing::check_true(std::is_same_v<caccess, const double&>);
   testing::check_false(std::is_assignable_v<caccess, double>);
+
+  // Check that subviews preserve const-correctness.
+  auto subview{view.slice<0>(0)};
+  using subaccess = decltype(subview(0, 0));
+  testing::check_true(std::is_same_v<subaccess, double&>);
+  testing::check_true(std::is_assignable_v<subaccess, double>);
+
+  auto csubview{cview.slice<0>(0)};
+  using csubaccess = decltype(csubview(0, 0));
+  testing::check_true(std::is_same_v<csubaccess, const double&>);
+  testing::check_false(std::is_assignable_v<csubaccess, double>);
 }
 
 void test_copy_and_move_semantics() {
@@ -139,6 +253,7 @@ void test_additional_properties() {
 
 void run_test_suite() {
   test_construction_and_data_manipulation();
+  test_slicing();
   test_const_correctness();
   test_copy_and_move_semantics();
   test_reference_semantics();
