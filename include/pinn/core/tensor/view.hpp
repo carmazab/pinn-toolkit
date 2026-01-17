@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "pinn/core/assert.hpp"
 #include "pinn/core/tensor/buffer.hpp"
 #include "pinn/core/types.hpp"
 
@@ -9,7 +10,7 @@ namespace core {
 namespace tensor {
 template <class DataT, index_t Rank>
 struct View {
-  static_assert(Rank > 0);
+  static_assert(Rank > 0, "Rank must be greater than zero");
 
   using data_t = DataT;
   using indexer_t = std::array<index_t, Rank>;
@@ -25,16 +26,31 @@ struct View {
   }
 
   constexpr data_t& operator()(const indexer_t& index) const noexcept {
+#ifndef NDEBUG
+    for (index_t j{0}; j < Rank; ++j) {
+      CORE_ASSERT(index[j] < extents[j], "View index out of bounds");
+    }
+#endif
+
     index_t offset{0};
     for (index_t j{0}; j < Rank; ++j) {
       offset += index[j] * strides[j];
     }
+
     return data[offset];
   }
 
   template <index_t Dim>
   constexpr View<DataT, Rank - 1> slice(index_t index) const noexcept {
-    std::array<index_t, Rank - 1> subextents, substrides;
+    static_assert(Rank > 1, "Slicing a tensor of rank less than 2 not allowed");
+    static_assert(Dim < Rank, "Slice dimension out of bounds");
+
+#ifndef NDEBUG
+    CORE_ASSERT(index < extents[Dim], "Slice index out of bounds");
+#endif
+
+    std::array<index_t, Rank - 1> subextents;
+    std::array<index_t, Rank - 1> substrides;
 
     index_t idx{0};
     for (index_t r{0}; r < Rank; ++r) {
