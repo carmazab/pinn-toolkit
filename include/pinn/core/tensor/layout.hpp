@@ -3,12 +3,13 @@
 #include <algorithm>
 #include <array>
 #include <concepts>
+#include <utility>
 
 #include "pinn/core/types.hpp"
 
 namespace core {
 namespace tensor {
-namespace detail {
+namespace layout_detail {
 template <index_t... Sequence>
 consteval bool is_unique_v() {
   std::array<index_t, sizeof...(Sequence)> seq{Sequence...};
@@ -27,17 +28,18 @@ template <index_t... Sequence>
 concept InRange = ((Sequence < sizeof...(Sequence)) && ...);
 
 template <index_t... Sequence>
-concept Unique = detail::is_unique_v<Sequence...>();
-}  // namespace detail
+concept Unique = layout_detail::is_unique_v<Sequence...>();
+}  // namespace layout_detail
 
 template <index_t... Sequence>
 concept LayoutOrder =
-    detail::NonEmpty<Sequence...> && detail::InRange<Sequence...> &&
-    detail::Unique<Sequence...>;
+    layout_detail::NonEmpty<Sequence...> &&
+    layout_detail::InRange<Sequence...> && layout_detail::Unique<Sequence...>;
 
 template <index_t... Order>
   requires LayoutOrder<Order...>
 struct Layout {
+  using ordering = std::integer_sequence<index_t, Order...>;
   using indexer_t = std::array<index_t, sizeof...(Order)>;
 
   static constexpr indexer_t order = {Order...};
