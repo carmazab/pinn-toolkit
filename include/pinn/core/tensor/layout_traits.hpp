@@ -72,6 +72,6 @@ template <class T, T ToSlice, class LayoutT>
   requires(ToSlice < LayoutT::rank)
 using sliced_layout =
     typename detail::sliced_layout_impl<T, ToSlice,
-                                        typename LayoutT::ordering>::type;
+                                        typename LayoutT::permutation_t>::type;
 }  // namespace tensor
 }  // namespace core

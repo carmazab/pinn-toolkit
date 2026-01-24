@@ -9,7 +9,7 @@ void test_strides() {
   using layout_t = LayoutT;
   using indexer_t = layout_t::indexer_t;
 
-  constexpr indexer_t order{layout_t::order};
+  constexpr indexer_t permutation{layout_t::permutation};
   constexpr core::index_t rank{layout_t::rank};
 
   testing::check_equal(rank, indexer_t{}.size());
@@ -28,9 +28,10 @@ void test_strides() {
 
   const auto expected_strides = [&]() {
     indexer_t result{};
-    result[order[0]] = 1;
+    result[permutation[0]] = 1;
     for (core::index_t j{0}; j < rank - 1; ++j) {
-      result[order[j + 1]] = extents[order[j]] * result[order[j]];
+      result[permutation[j + 1]] =
+          extents[permutation[j]] * result[permutation[j]];
     }
     return result;
   }();
@@ -86,17 +87,17 @@ void test_constexpr_strides() {
   testing::check_equal(strides[1], core::index_t{1});
 }
 
-void test_invalid_orders() {
-  testing::check_false(core::tensor::LayoutOrder<>);
-  testing::check_false(core::tensor::LayoutOrder<0, 2>);
-  testing::check_false(core::tensor::LayoutOrder<1, 1, 2>);
-  testing::check_false(core::tensor::LayoutOrder<2, 3, 1>);
+void test_invalid_permutations() {
+  testing::check_false(core::tensor::Valid<>);
+  testing::check_false(core::tensor::Valid<0, 2>);
+  testing::check_false(core::tensor::Valid<1, 1, 2>);
+  testing::check_false(core::tensor::Valid<2, 3, 1>);
 }
 
 void run_test_suite() {
   test_strides_implementation();
   test_constexpr_strides();
-  test_invalid_orders();
+  test_invalid_permutations();
 }
 }  // namespace
 
