@@ -1,8 +1,9 @@
 #pragma once
 
+#include <array>
+
 #include "pinn/core/assert.hpp"
 #include "pinn/core/tensor/buffer.hpp"
-#include "pinn/core/tensor/layout.hpp"
 #include "pinn/core/tensor/layout_traits.hpp"
 #include "pinn/core/types.hpp"
 
