@@ -1,7 +1,5 @@
 #pragma once
 
-#include <array>
-
 #include "pinn/core/assert.hpp"
 #include "pinn/core/tensor/buffer.hpp"
 #include "pinn/core/tensor/layout_traits.hpp"
@@ -51,9 +49,11 @@ struct View {
 #ifndef NDEBUG
     CORE_ASSERT(index < extents[Dim], "Slice index out of bounds");
 #endif
+    using sliced_layout_t = sliced_layout<index_t, Dim, layout_t>;
+    using sliced_indexer_t = sliced_layout_t::indexer_t;
 
-    std::array<index_t, rank - 1> subextents;
-    std::array<index_t, rank - 1> substrides;
+    sliced_indexer_t subextents;
+    sliced_indexer_t substrides;
 
     index_t idx{0};
     for (index_t r{0}; r < rank; ++r) {
@@ -64,8 +64,8 @@ struct View {
       }
     }
 
-    return View<sliced_layout<index_t, Dim, layout_t>, data_t>{
-        data + index * strides[Dim], subextents, substrides};
+    return View<sliced_layout_t, data_t>{data + index * strides[Dim],
+                                         subextents, substrides};
   }
 };
 
