@@ -40,15 +40,23 @@ struct View {
     return data[offset];
   }
 
-  template <index_t Dim>
-  constexpr View<sliced_layout<Dim, layout_t>, data_t> slice(
-      index_t index) const noexcept {
-    static_assert(rank > 1, "Slicing a tensor of rank less than 2 not allowed");
-    static_assert(Dim < rank, "Slice dimension out of bounds");
+  template <index_t... Permutation>
+    requires Valid<Permutation...> && (sizeof...(Permutation) == rank)
+  constexpr auto permute() const noexcept {
+    using permuted_layout_t = permuted_layout<layout_t, Permutation...>;
+    using permuted_indexer_t = permuted_layout_t::indexer_t;
+    return View<permuted_layout_t, data_t>{
+        data, permuted_indexer_t{extents[Permutation]...},
+        permuted_indexer_t{strides[Permutation]...}};
+  }
 
+  template <index_t Dim>
+    requires(Dim < rank)
+  constexpr auto slice(index_t index) const noexcept {
 #ifndef NDEBUG
     CORE_ASSERT(index < extents[Dim], "Slice index out of bounds");
 #endif
+
     using sliced_layout_t = sliced_layout<Dim, layout_t>;
     using sliced_indexer_t = sliced_layout_t::indexer_t;
 
@@ -56,10 +64,10 @@ struct View {
     sliced_indexer_t substrides;
 
     index_t idx{0};
-    for (index_t r{0}; r < rank; ++r) {
-      if (r != Dim) {
-        subextents[idx] = extents[r];
-        substrides[idx] = strides[r];
+    for (index_t j{0}; j < rank; ++j) {
+      if (j != Dim) {
+        subextents[idx] = extents[j];
+        substrides[idx] = strides[j];
         ++idx;
       }
     }
