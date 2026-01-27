@@ -41,7 +41,7 @@ struct View {
   }
 
   template <index_t Dim>
-  constexpr View<sliced_layout<index_t, Dim, layout_t>, data_t> slice(
+  constexpr View<sliced_layout<Dim, layout_t>, data_t> slice(
       index_t index) const noexcept {
     static_assert(rank > 1, "Slicing a tensor of rank less than 2 not allowed");
     static_assert(Dim < rank, "Slice dimension out of bounds");
@@ -49,7 +49,7 @@ struct View {
 #ifndef NDEBUG
     CORE_ASSERT(index < extents[Dim], "Slice index out of bounds");
 #endif
-    using sliced_layout_t = sliced_layout<index_t, Dim, layout_t>;
+    using sliced_layout_t = sliced_layout<Dim, layout_t>;
     using sliced_indexer_t = sliced_layout_t::indexer_t;
 
     sliced_indexer_t subextents;

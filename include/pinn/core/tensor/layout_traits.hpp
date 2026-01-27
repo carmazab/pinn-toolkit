@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "pinn/core/tensor/layout.hpp"
+#include "pinn/core/types.hpp"
 
 namespace core {
 namespace tensor {
@@ -49,14 +50,14 @@ struct sliced_permutation<T, Dim, std::integer_sequence<T, Permutation...>> {
 template <class S>
 struct make_layout;
 
-template <class T, T... Permutation>
-struct make_layout<std::integer_sequence<T, Permutation...>> {
+template <index_t... Permutation>
+struct make_layout<std::integer_sequence<index_t, Permutation...>> {
   using type = Layout<Permutation...>;
 };
 
-template <class T, T Dim, class LayoutT>
+template <index_t Dim, class LayoutT>
 using sliced_layout =
     typename make_layout<typename layout_detail::sliced_permutation<
-        T, Dim, typename LayoutT::permutation_t>::type>::type;
+        index_t, Dim, typename LayoutT::permutation_t>::type>::type;
 }  // namespace tensor
 }  // namespace core
