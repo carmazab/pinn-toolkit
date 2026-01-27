@@ -8,6 +8,35 @@
 
 namespace core {
 namespace tensor {
+template <class S>
+struct make_layout;
+
+template <index_t... Permutation>
+struct make_layout<std::integer_sequence<index_t, Permutation...>> {
+  using type = Layout<Permutation...>;
+};
+
+namespace layout_detail {
+template <class T, T... Os, T... Pis>
+consteval auto apply_permutation(std::integer_sequence<T, Os...>,
+                                 std::integer_sequence<T, Pis...>) {
+  constexpr auto rank{sizeof...(Os)};
+  constexpr std::array<T, rank> os{Os...};
+  constexpr std::array<T, rank> pis{Pis...};
+  return [&]<index_t... Is>(std::integer_sequence<index_t, Is...>) {
+    return std::integer_sequence<T, os[pis[Is]]...>{};
+  }(std::make_integer_sequence<index_t, rank>{});
+}
+
+template <class Original, class Map>
+using permute_permutation = decltype(apply_permutation(Original{}, Map{}));
+}  // namespace layout_detail
+
+template <class LayoutT, index_t... Pis>
+using permuted_layout = typename make_layout<layout_detail::permute_permutation<
+    typename LayoutT::permutation_t,
+    std::integer_sequence<index_t, Pis...>>>::type;
+
 namespace layout_detail {
 template <class T, T Dim, T... Permutation>
 consteval auto slice_permutation_array() {
@@ -46,14 +75,6 @@ struct sliced_permutation<T, Dim, std::integer_sequence<T, Permutation...>> {
   using type = decltype(slice_permutation<T, Dim, Permutation...>());
 };
 }  // namespace layout_detail
-
-template <class S>
-struct make_layout;
-
-template <index_t... Permutation>
-struct make_layout<std::integer_sequence<index_t, Permutation...>> {
-  using type = Layout<Permutation...>;
-};
 
 template <index_t Dim, class LayoutT>
 using sliced_layout =
