@@ -31,20 +31,19 @@ using reordered_layout = make_layout_t<layout_detail::reorder_axes<
 namespace layout_detail {
 template <class T, T Dim, T... Order>
 consteval auto sliced_order_as_array() {
-  constexpr T flag{std::numeric_limits<T>::max()};
-
   constexpr auto size{sizeof...(Order)};
-  std::array<T, size> tmp{Order...};
-  for (index_t j{0}; j < size; ++j) {
-    tmp[j] = tmp[j] < Dim ? tmp[j] : tmp[j] > Dim ? tmp[j] - 1 : flag;
-  }
+  std::array<T, size> order{Order...};
+  T removed_stride{order[Dim]};
 
   index_t idx{0};
   std::array<T, size - 1> result{};
   for (index_t j{0}; j < size; ++j) {
-    if (tmp[j] != flag) {
-      result[idx++] = tmp[j];
+    if (j == Dim) {
+      continue;
     }
+
+    T jth{order[j]};
+    result[idx++] = jth < removed_stride ? jth : jth - 1;
   }
 
   return result;
