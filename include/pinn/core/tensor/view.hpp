@@ -40,14 +40,15 @@ struct View {
     return data[offset];
   }
 
-  template <index_t... Permutation>
-    requires Valid<Permutation...> && (sizeof...(Permutation) == rank)
+  template <index_t... AxisMap>
+    requires AxisPermutation<AxisMap...> && (sizeof...(AxisMap) == rank)
   constexpr auto permute() const noexcept {
-    using permuted_layout_t = permuted_layout<layout_t, Permutation...>;
-    using permuted_indexer_t = permuted_layout_t::indexer_t;
-    return View<permuted_layout_t, data_t>{
-        data, permuted_indexer_t{extents[Permutation]...},
-        permuted_indexer_t{strides[Permutation]...}};
+    using reordered_layout_t = reordered_layout<layout_t, AxisMap...>;
+    using reordered_indexer_t = reordered_layout_t::indexer_t;
+
+    return View<reordered_layout_t, data_t>{
+        data, reordered_indexer_t{extents[AxisMap]...},
+        reordered_indexer_t{strides[AxisMap]...}};
   }
 
   template <index_t Dim>
@@ -57,7 +58,7 @@ struct View {
     CORE_ASSERT(index < extents[Dim], "Slice index out of bounds");
 #endif
 
-    using sliced_layout_t = sliced_layout<Dim, layout_t>;
+    using sliced_layout_t = sliced_layout<layout_t, Dim>;
     using sliced_indexer_t = sliced_layout_t::indexer_t;
 
     sliced_indexer_t subextents;
@@ -78,27 +79,22 @@ struct View {
 };
 
 template <class LayoutT, class DataT>
-constexpr View<LayoutT, DataT> make_view(
-    DataT* data, const typename LayoutT::indexer_t& extents) noexcept {
-  View<LayoutT, DataT> view{};
-  view.data = data;
-  view.extents = extents;
-  view.strides = LayoutT::strides_from_extents(extents);
-  return view;
+constexpr auto make_view(DataT* data,
+                         const typename LayoutT::indexer_t& extents) noexcept {
+  return View<LayoutT, DataT>{data, extents,
+                              LayoutT::strides_from_extents(extents)};
 }
 
 template <class LayoutT, class DataT>
-constexpr View<LayoutT, DataT> make_view(
-    Buffer<DataT>& buffer,
-    const typename LayoutT::indexer_t& extents) noexcept {
+constexpr auto make_view(Buffer<DataT>& buffer,
+                         const typename LayoutT::indexer_t& extents) noexcept {
   return View<LayoutT, DataT>{buffer.data(), extents,
                               LayoutT::strides_from_extents(extents)};
 }
 
 template <class LayoutT, class DataT>
-constexpr View<LayoutT, const DataT> make_view(
-    const Buffer<DataT>& buffer,
-    const typename LayoutT::indexer_t& extents) noexcept {
+constexpr auto make_view(const Buffer<DataT>& buffer,
+                         const typename LayoutT::indexer_t& extents) noexcept {
   return View<LayoutT, const DataT>{buffer.data(), extents,
                                     LayoutT::strides_from_extents(extents)};
 }

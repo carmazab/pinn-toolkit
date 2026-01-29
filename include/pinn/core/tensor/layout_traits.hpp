@@ -8,77 +8,62 @@
 
 namespace core {
 namespace tensor {
-template <class S>
-struct make_layout;
-
-template <index_t... Permutation>
-struct make_layout<std::integer_sequence<index_t, Permutation...>> {
-  using type = Layout<Permutation...>;
-};
-
 namespace layout_detail {
-template <class T, T... Os, T... Pis>
-consteval auto apply_permutation(std::integer_sequence<T, Os...>,
-                                 std::integer_sequence<T, Pis...>) {
-  constexpr auto rank{sizeof...(Os)};
-  constexpr std::array<T, rank> os{Os...};
-  constexpr std::array<T, rank> pis{Pis...};
+template <class T, T... Order, T... Map>
+consteval auto apply_axis_map(std::integer_sequence<T, Order...>,
+                              std::integer_sequence<T, Map...>) {
+  constexpr auto size{sizeof...(Order)};
+  constexpr std::array<T, size> order{Order...};
+  constexpr std::array<T, size> map{Map...};
   return [&]<index_t... Is>(std::integer_sequence<index_t, Is...>) {
-    return std::integer_sequence<T, os[pis[Is]]...>{};
-  }(std::make_integer_sequence<index_t, rank>{});
+    return std::integer_sequence<T, order[map[Is]]...>{};
+  }(std::make_integer_sequence<index_t, size>{});
 }
 
-template <class Original, class Map>
-using permute_permutation = decltype(apply_permutation(Original{}, Map{}));
+template <class OrderT, class MapT>
+using reorder_axes = decltype(apply_axis_map(OrderT{}, MapT{}));
 }  // namespace layout_detail
 
-template <class LayoutT, index_t... Pis>
-using permuted_layout = typename make_layout<layout_detail::permute_permutation<
-    typename LayoutT::permutation_t,
-    std::integer_sequence<index_t, Pis...>>>::type;
+template <class LayoutT, index_t... Map>
+using reordered_layout = make_layout_t<layout_detail::reorder_axes<
+    typename LayoutT::stride_order_t, std::integer_sequence<index_t, Map...>>>;
 
 namespace layout_detail {
-template <class T, T Dim, T... Permutation>
-consteval auto slice_permutation_array() {
-  constexpr T flag{999};
+template <class T, T Dim, T... Order>
+consteval auto sliced_order_as_array() {
+  constexpr T flag{std::numeric_limits<T>::max()};
 
-  constexpr auto rank{sizeof...(Permutation)};
-  std::array<T, rank> tmp{Permutation...};
-  for (index_t i{0}; i < rank; ++i) {
-    tmp[i] = tmp[i] < Dim ? tmp[i] : tmp[i] > Dim ? tmp[i] - 1 : flag;
+  constexpr auto size{sizeof...(Order)};
+  std::array<T, size> tmp{Order...};
+  for (index_t j{0}; j < size; ++j) {
+    tmp[j] = tmp[j] < Dim ? tmp[j] : tmp[j] > Dim ? tmp[j] - 1 : flag;
   }
 
-  index_t j{0};
-  std::array<T, rank - 1> result{};
-  for (index_t i{0}; i < rank; ++i) {
-    if (tmp[i] != flag) {
-      result[j++] = tmp[i];
+  index_t idx{0};
+  std::array<T, size - 1> result{};
+  for (index_t j{0}; j < size; ++j) {
+    if (tmp[j] != flag) {
+      result[idx++] = tmp[j];
     }
   }
 
   return result;
 }
 
-template <class T, T Dim, T... Permutation>
-consteval auto slice_permutation() {
-  constexpr auto perm{slice_permutation_array<T, Dim, Permutation...>()};
+template <class T, T Dim, T... Order>
+consteval auto apply_slicing(std::integer_sequence<T, Order...>) {
+  constexpr auto sliced_order{sliced_order_as_array<T, Dim, Order...>()};
   return [&]<index_t... Is>(std::integer_sequence<index_t, Is...>) {
-    return std::integer_sequence<T, perm[Is]...>{};
-  }(std::make_integer_sequence<index_t, perm.size()>{});
+    return std::integer_sequence<T, sliced_order[Is]...>{};
+  }(std::make_integer_sequence<index_t, sizeof...(Order) - 1>{});
 }
 
-template <class T, T Dim, class S>
-struct sliced_permutation;
-
-template <class T, T Dim, T... Permutation>
-struct sliced_permutation<T, Dim, std::integer_sequence<T, Permutation...>> {
-  using type = decltype(slice_permutation<T, Dim, Permutation...>());
-};
+template <class T, T Dim, class StrideOrderT>
+using slice_stride_order = decltype(apply_slicing<T, Dim>(StrideOrderT{}));
 }  // namespace layout_detail
 
-template <index_t Dim, class LayoutT>
-using sliced_layout =
-    typename make_layout<typename layout_detail::sliced_permutation<
-        index_t, Dim, typename LayoutT::permutation_t>::type>::type;
+template <class LayoutT, index_t Dim>
+using sliced_layout = make_layout_t<layout_detail::slice_stride_order<
+    index_t, Dim, typename LayoutT::stride_order_t>>;
 }  // namespace tensor
 }  // namespace core
