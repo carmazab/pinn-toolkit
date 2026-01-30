@@ -3,5 +3,6 @@ add_unit_test_executable(
   SOURCES
   test_buffer.cpp
   test_layout.cpp
+  test_layout_traits.cpp
   test_view.cpp
 )
