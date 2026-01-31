@@ -57,6 +57,60 @@ void test_permute() {
     }
   }
 
+  SECTION("Reversed layout.") {
+    using expected_layout = core::tensor::Layout<2, 0, 3, 1>;
+    const core::tensor::View<expected_layout, double> reversed{
+        view.reverse_layout()};
+
+    std::array<index_t, rank> map{3, 2, 1, 0};
+    for (index_t j{0}; j < rank; ++j) {
+      testing::check_equal(reversed.extents[j], view.extents[map[j]]);
+      testing::check_equal(reversed.strides[j], view.strides[map[j]]);
+    }
+
+    for (index_t j0{0}; j0 < ext_0; ++j0) {
+      for (index_t j1{0}; j1 < ext_1; ++j1) {
+        for (index_t j2{0}; j2 < ext_2; ++j2) {
+          for (index_t j3{0}; j3 < ext_3; ++j3) {
+            testing::check_equal_within(view(j0, j1, j2, j3),
+                                        reversed(j3, j2, j1, j0));
+
+            const double new_value{rng.normal(mean, stddev)};
+            reversed(j3, j2, j1, j0) = new_value;
+            testing::check_equal_within(view(j0, j1, j2, j3), new_value);
+          }
+        }
+      }
+    }
+  }
+
+  SECTION("Transposition of two axes.") {
+    using expected_layout = core::tensor::Layout<1, 2, 0, 3>;
+    const core::tensor::View<expected_layout, double> transposed{
+        view.transpose<1, 3>()};
+
+    std::array<index_t, rank> map{0, 3, 2, 1};
+    for (index_t j{0}; j < rank; ++j) {
+      testing::check_equal(transposed.extents[j], view.extents[map[j]]);
+      testing::check_equal(transposed.strides[j], view.strides[map[j]]);
+    }
+
+    for (index_t j0{0}; j0 < ext_0; ++j0) {
+      for (index_t j1{0}; j1 < ext_1; ++j1) {
+        for (index_t j2{0}; j2 < ext_2; ++j2) {
+          for (index_t j3{0}; j3 < ext_3; ++j3) {
+            testing::check_equal_within(view(j0, j1, j2, j3),
+                                        transposed(j0, j3, j2, j1));
+
+            const double new_value{rng.normal(mean, stddev)};
+            transposed(j0, j3, j2, j1) = new_value;
+            testing::check_equal_within(view(j0, j1, j2, j3), new_value);
+          }
+        }
+      }
+    }
+  }
+
   SECTION("Nontrivial permutation 1.") {
     using expected_layout = core::tensor::Layout<0, 2, 3, 1>;
     const core::tensor::View<expected_layout, double> permuted{
@@ -265,10 +319,20 @@ void test_const_correctness_preservation() {
     testing::check_true(std::is_same_v<reaccess, double&>);
     testing::check_true(std::is_assignable_v<reaccess, double>);
 
+    auto reverse{view.reverse_layout()};
+    using revaccess = decltype(reverse(0, 0, 0));
+    testing::check_true(std::is_same_v<revaccess, double&>);
+    testing::check_true(std::is_assignable_v<revaccess, double>);
+
     auto subview{view.slice<0>(0)};
     using subaccess = decltype(subview(0, 0));
     testing::check_true(std::is_same_v<subaccess, double&>);
     testing::check_true(std::is_assignable_v<subaccess, double>);
+
+    auto asd{view.transpose<0, 2>()};
+    using traccess = decltype(asd(0, 0, 0));
+    testing::check_true(std::is_same_v<traccess, double&>);
+    testing::check_true(std::is_assignable_v<traccess, double>);
   }
 
   SECTION("Test correctness with const views.") {
@@ -280,10 +344,20 @@ void test_const_correctness_preservation() {
     testing::check_true(std::is_same_v<creaccess, const double&>);
     testing::check_false(std::is_assignable_v<creaccess, double>);
 
+    auto creverse{cview.reverse_layout()};
+    using crevaccess = decltype(creverse(0, 0, 0));
+    testing::check_true(std::is_same_v<crevaccess, const double&>);
+    testing::check_false(std::is_assignable_v<crevaccess, double>);
+
     auto csubview{cview.slice<0>(0)};
     using csubaccess = decltype(csubview(0, 0));
     testing::check_true(std::is_same_v<csubaccess, const double&>);
     testing::check_false(std::is_assignable_v<csubaccess, double>);
+
+    auto ctranspose{cview.transpose<0, 2>()};
+    using ctraccess = decltype(ctranspose(0, 0, 0));
+    testing::check_true(std::is_same_v<ctraccess, const double&>);
+    testing::check_false(std::is_assignable_v<ctraccess, double>);
   }
 }
 

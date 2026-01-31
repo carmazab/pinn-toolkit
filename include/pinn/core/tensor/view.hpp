@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "pinn/core/assert.hpp"
 #include "pinn/core/tensor/buffer.hpp"
 #include "pinn/core/tensor/layout_traits.hpp"
@@ -43,12 +45,22 @@ struct View {
   template <index_t... AxisMap>
     requires AxisPermutation<AxisMap...> && (sizeof...(AxisMap) == rank)
   constexpr auto permute() const noexcept {
-    using reordered_layout_t = reordered_layout<layout_t, AxisMap...>;
-    using reordered_indexer_t = reordered_layout_t::indexer_t;
+    return View<reordered_layout<layout_t, AxisMap...>, data_t>{
+        data, indexer_t{extents[AxisMap]...}, indexer_t{strides[AxisMap]...}};
+  }
 
-    return View<reordered_layout_t, data_t>{
-        data, reordered_indexer_t{extents[AxisMap]...},
-        reordered_indexer_t{strides[AxisMap]...}};
+  constexpr auto reverse_layout() const noexcept {
+    return [&]<index_t... Is>(std::integer_sequence<index_t, Is...>) {
+      return permute<(sizeof...(Is) - 1 - Is)...>();
+    }(std::make_integer_sequence<index_t, rank>{});
+  }
+
+  template <index_t L, index_t R>
+    requires(L < rank) && (R < rank)
+  constexpr auto transpose() const noexcept {
+    return [&]<index_t... Is>(std::integer_sequence<index_t, Is...>) {
+      return permute<(Is == L ? R : Is == R ? L : Is)...>();
+    }(std::make_integer_sequence<index_t, rank>{});
   }
 
   template <index_t Dim>
