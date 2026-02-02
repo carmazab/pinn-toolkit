@@ -30,7 +30,7 @@ void test_permute() {
   const core::tensor::View<layout, double> view{
       core::tensor::make_view<layout>(buffer, extents)};
 
-  SECTION("Identity permutation does not change layout.") {
+  {  // Check that identity permutation does not change layout.
     using expected_layout = layout;
     const core::tensor::View<expected_layout, double> permuted{
         view.permute<0, 1, 2, 3>()};
@@ -57,7 +57,7 @@ void test_permute() {
     }
   }
 
-  SECTION("Reversed layout.") {
+  {  // Check reversed layout.
     using expected_layout = core::tensor::Layout<2, 0, 3, 1>;
     const core::tensor::View<expected_layout, double> reversed{
         view.reverse_layout()};
@@ -84,7 +84,7 @@ void test_permute() {
     }
   }
 
-  SECTION("Transposition of two axes.") {
+  {  // Check transposition of two axes.
     using expected_layout = core::tensor::Layout<1, 2, 0, 3>;
     const core::tensor::View<expected_layout, double> transposed{
         view.transpose<1, 3>()};
@@ -111,7 +111,7 @@ void test_permute() {
     }
   }
 
-  SECTION("Nontrivial permutation 1.") {
+  {  // Check nontrivial permutation.
     using expected_layout = core::tensor::Layout<0, 2, 3, 1>;
     const core::tensor::View<expected_layout, double> permuted{
         view.permute<2, 3, 1, 0>()};
@@ -138,7 +138,7 @@ void test_permute() {
     }
   }
 
-  SECTION("Nontrivial permutation 2.") {
+  {  // Check another nontrivial permutation.
     using expected_layout = core::tensor::Layout<1, 0, 2, 3>;
     const core::tensor::View<expected_layout, double> permuted{
         view.permute<0, 2, 3, 1>()};
@@ -187,7 +187,7 @@ void test_slice() {
   const core::tensor::View<layout, double> view{
       core::tensor::make_view<layout>(buffer, extents)};
 
-  SECTION("Slicing along first axis.") {
+  {  // Check slicing along first axis.
     using expected_layout = core::tensor::Layout<2, 0, 1>;
 
     for (index_t slice_index{0}; slice_index < extents[0]; ++slice_index) {
@@ -216,7 +216,7 @@ void test_slice() {
     }
   }
 
-  SECTION("Slicing along second axis.") {
+  {  // Check slicing along second axis.
     using expected_layout = core::tensor::Layout<1, 0, 2>;
 
     for (index_t slice_index{0}; slice_index < extents[1]; ++slice_index) {
@@ -245,7 +245,7 @@ void test_slice() {
     }
   }
 
-  SECTION("Slicing along third axis.") {
+  {  // Check slicing along third axis.
     using expected_layout = core::tensor::Layout<0, 2, 1>;
 
     for (index_t slice_index{0}; slice_index < extents[2]; ++slice_index) {
@@ -274,7 +274,7 @@ void test_slice() {
     }
   }
 
-  SECTION("Slicing along fourth axis.") {
+  {  // Check slicing along fourth axis.
     using expected_layout = core::tensor::Layout<1, 2, 0>;
 
     for (index_t slice_index{0}; slice_index < extents[3]; ++slice_index) {
@@ -303,7 +303,7 @@ void test_slice() {
     }
   }
 
-  {// Slice a rank-1 view should give a scalar.
+  {  // Check that slicing a rank-1 view gives a scalar.
     constexpr core::index_t extent{5};
     double another_buffer[extent];
     for (index_t j{0}; j < extent; ++j) {
@@ -328,7 +328,7 @@ void test_const_correctness_preservation() {
   constexpr layout::indexer_t extents{2, 3, 4};
   const core::index_t size{extents[0] * extents[1] * extents[2]};
 
-  SECTION("Test correctness with mutable views.") {
+  {  // Test correctness with mutable views.
     core::tensor::Buffer<double> buffer{size};
     auto view{core::tensor::make_view<layout>(buffer, extents)};
 
@@ -353,7 +353,7 @@ void test_const_correctness_preservation() {
     testing::check_true(std::is_assignable_v<traccess, double>);
   }
 
-  SECTION("Test correctness with const views.") {
+  {  // Test correctness with const views.
     const core::tensor::Buffer<double> cbuffer{size};
     auto cview{core::tensor::make_view<layout>(cbuffer, extents)};
 

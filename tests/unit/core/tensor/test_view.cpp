@@ -73,7 +73,7 @@ void test_construction_and_indexing() {
 void test_const_correctness() {
   using layout = core::tensor::Layout<0, 1, 2>;
 
-  SECTION("Check access of view constructed from raw pointer.") {
+  {  // Check access of view constructed from raw pointer.
     using writable = core::tensor::View<layout, double>;
     using writable_access = decltype(std::declval<writable>()(0, 0, 0));
     testing::check_true(std::is_same_v<writable_access, double&>);
@@ -90,7 +90,7 @@ void test_const_correctness() {
     testing::check_false(std::is_assignable_v<readonly_access, double>);
   }
 
-  SECTION("Check access of view constructed from buffer.") {
+  {  // Check access of view constructed from buffer.
     constexpr layout::indexer_t extents{2, 3, 4};
     const core::index_t size{extents[0] * extents[1] * extents[2]};
 
