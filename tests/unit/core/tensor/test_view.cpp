@@ -58,6 +58,16 @@ void test_construction_and_indexing() {
       }
     }
   }
+
+  using layout_scalar = core::tensor::Layout<>;
+  testing::check_equal(layout_scalar::rank, core::index_t{0});
+
+  auto scalar{core::tensor::make_view(buffer)};
+  testing::check_equal_within(scalar(), buffer[0]);
+
+  auto another_scalar{core::tensor::make_view<double>(buffer)};
+  scalar() = rng.normal(mean, stddev);
+  testing::check_equal_within(another_scalar(), scalar());
 }
 
 void test_const_correctness() {

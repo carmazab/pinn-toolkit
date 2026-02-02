@@ -13,9 +13,6 @@ namespace layout_detail {
 template <index_t... Elements>
 consteval bool is_axis_permutation_v() {
   constexpr auto size{sizeof...(Elements)};
-  if (size == 0) {
-    return false;
-  }
 
   std::array<index_t, size> elements{Elements...};
   std::sort(elements.begin(), elements.end());
@@ -48,12 +45,17 @@ struct Layout {
   }
 
   static constexpr indexer_t strides_from_extents(indexer_t extents) noexcept {
+    if constexpr (rank == 0) {
+      return indexer_t{};
+    }
+
     indexer_t result{};
     result[stride_order[0]] = 1;
-    for (index_t j{0}; j < extents.size() - 1; ++j) {
+    for (index_t j{0}; j < rank - 1; ++j) {
       result[stride_order[j + 1]] =
           extents[stride_order[j]] * result[stride_order[j]];
     }
+
     return result;
   }
 };

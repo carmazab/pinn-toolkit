@@ -88,7 +88,6 @@ void test_constexpr_strides() {
 }
 
 void test_invalid_permutations() {
-  testing::check_false(core::tensor::AxisPermutation<>);
   testing::check_false(core::tensor::AxisPermutation<0, 2>);
   testing::check_false(core::tensor::AxisPermutation<1, 1, 2>);
   testing::check_false(core::tensor::AxisPermutation<2, 3, 1>);

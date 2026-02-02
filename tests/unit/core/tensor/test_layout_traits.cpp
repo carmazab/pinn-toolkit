@@ -302,6 +302,24 @@ void test_slice() {
       }
     }
   }
+
+  {// Slice a rank-1 view should give a scalar.
+    constexpr core::index_t extent{5};
+    double another_buffer[extent];
+    for (index_t j{0}; j < extent; ++j) {
+      another_buffer[j] = rng.normal(mean, stddev);
+    }
+
+    using layout_1d = core::tensor::Layout<0>;
+    const auto view_1d{core::tensor::make_view<layout_1d>(
+        another_buffer, layout_1d::indexer_t{extent})};
+
+    using expected_layout = core::tensor::Layout<>;
+    const core::index_t index{rng.uniform_int<core::index_t>(0, extent - 1)};
+    const core::tensor::View<expected_layout, double> slice{
+        view_1d.slice<0>(index)};
+    testing::check_equal_within(slice(), another_buffer[index]);
+  }
 }
 
 void test_const_correctness_preservation() {

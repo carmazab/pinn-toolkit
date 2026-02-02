@@ -4,6 +4,7 @@
 
 #include "pinn/core/assert.hpp"
 #include "pinn/core/tensor/buffer.hpp"
+#include "pinn/core/tensor/layout.hpp"
 #include "pinn/core/tensor/layout_traits.hpp"
 #include "pinn/core/types.hpp"
 
@@ -109,6 +110,21 @@ constexpr auto make_view(const Buffer<DataT>& buffer,
                          const typename LayoutT::indexer_t& extents) noexcept {
   return View<LayoutT, const DataT>{buffer.data(), extents,
                                     LayoutT::strides_from_extents(extents)};
+}
+
+template <class DataT>
+constexpr auto make_view(DataT* data) noexcept {
+  return make_view<Layout<>, DataT>(data, Layout<>::indexer_t{});
+}
+
+template <class DataT>
+constexpr auto make_view(Buffer<DataT>& buffer) noexcept {
+  return make_view<DataT>(buffer.data());
+}
+
+template <class DataT>
+constexpr auto make_view(const Buffer<DataT>& buffer) noexcept {
+  return make_view<const DataT>(buffer.data());
 }
 }  // namespace tensor
 }  // namespace core
