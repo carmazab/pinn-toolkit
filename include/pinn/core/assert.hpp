@@ -3,7 +3,13 @@
 #include <cassert>
 
 #ifndef NDEBUG
-#define CORE_ASSERT(condition, message) assert((condition) && (message))
+#define CORE_ASSERT(condition, message) \
+  do {                                  \
+    assert((condition) && (message));   \
+  } while (0)
 #else
-#define CORE_ASSERT(condition, message) ((void)0)
+#define CORE_ASSERT(condition, message) \
+  do {                                  \
+    (void)sizeof(condition);            \
+  } while (0)
 #endif

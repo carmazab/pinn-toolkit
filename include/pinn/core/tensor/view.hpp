@@ -29,11 +29,9 @@ struct View {
   }
 
   constexpr data_t& operator()(const indexer_t& index) const noexcept {
-#ifndef NDEBUG
     for (index_t j{0}; j < rank; ++j) {
       CORE_ASSERT(index[j] < extents[j], "View index out of bounds");
     }
-#endif
 
     index_t offset{0};
     for (index_t j{0}; j < rank; ++j) {
@@ -67,9 +65,7 @@ struct View {
   template <index_t Dim>
     requires(Dim < rank)
   constexpr auto slice(index_t index) const noexcept {
-#ifndef NDEBUG
     CORE_ASSERT(index < extents[Dim], "Slice index out of bounds");
-#endif
 
     using sliced_layout_t = sliced_layout<layout_t, Dim>;
     using sliced_indexer_t = sliced_layout_t::indexer_t;
