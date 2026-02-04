@@ -322,6 +322,26 @@ void test_slice() {
   }
 }
 
+void test_compositions() {
+  using layout = core::tensor::Layout<3, 4, 1, 0, 2>;
+  core::index_t size{4};
+  core::tensor::Buffer<double> buffer{size};
+  constexpr layout::indexer_t extents{1, 2, 1, 2, 1};
+  auto view{core::tensor::make_view<layout>(buffer, extents)};
+
+  auto comp_1{view.slice<2>(0).transpose<3, 2>().reverse_layout()};
+  using expected_1 = core::tensor::Layout<0, 1, 3, 2>;
+  testing::check_true(std::is_same_v<expected_1, decltype(comp_1)::layout_t>);
+
+  auto comp_2{view.permute<2, 0, 1, 4, 3>().transpose<3, 2>().slice<1>(0)};
+  using expected_2 = core::tensor::Layout<1, 2, 3, 0>;
+  testing::check_true(std::is_same_v<expected_2, decltype(comp_2)::layout_t>);
+
+  auto comp_3{view.slice<0>(0).slice<0>(0).slice<0>(0).reverse_layout()};
+  using expected_3 = core::tensor::Layout<1, 0>;
+  testing::check_true(std::is_same_v<expected_3, decltype(comp_3)::layout_t>);
+}
+
 void test_const_correctness_preservation() {
   using layout = core::tensor::Layout<0, 2, 1>;
 
@@ -332,13 +352,13 @@ void test_const_correctness_preservation() {
     core::tensor::Buffer<double> buffer{size};
     auto view{core::tensor::make_view<layout>(buffer, extents)};
 
-    auto reorder{view.permute<1, 2, 0>()};
-    using reaccess = decltype(reorder(0, 0, 0));
+    auto reordered{view.permute<1, 2, 0>()};
+    using reaccess = decltype(reordered(0, 0, 0));
     testing::check_true(std::is_same_v<reaccess, double&>);
     testing::check_true(std::is_assignable_v<reaccess, double>);
 
-    auto reverse{view.reverse_layout()};
-    using revaccess = decltype(reverse(0, 0, 0));
+    auto reversed{view.reverse_layout()};
+    using revaccess = decltype(reversed(0, 0, 0));
     testing::check_true(std::is_same_v<revaccess, double&>);
     testing::check_true(std::is_assignable_v<revaccess, double>);
 
@@ -347,8 +367,8 @@ void test_const_correctness_preservation() {
     testing::check_true(std::is_same_v<subaccess, double&>);
     testing::check_true(std::is_assignable_v<subaccess, double>);
 
-    auto asd{view.transpose<0, 2>()};
-    using traccess = decltype(asd(0, 0, 0));
+    auto transposed{view.transpose<0, 2>()};
+    using traccess = decltype(transposed(0, 0, 0));
     testing::check_true(std::is_same_v<traccess, double&>);
     testing::check_true(std::is_assignable_v<traccess, double>);
   }
@@ -357,13 +377,13 @@ void test_const_correctness_preservation() {
     const core::tensor::Buffer<double> cbuffer{size};
     auto cview{core::tensor::make_view<layout>(cbuffer, extents)};
 
-    auto creorder{cview.permute<1, 2, 0>()};
-    using creaccess = decltype(creorder(0, 0, 0));
+    auto creordered{cview.permute<1, 2, 0>()};
+    using creaccess = decltype(creordered(0, 0, 0));
     testing::check_true(std::is_same_v<creaccess, const double&>);
     testing::check_false(std::is_assignable_v<creaccess, double>);
 
-    auto creverse{cview.reverse_layout()};
-    using crevaccess = decltype(creverse(0, 0, 0));
+    auto creversed{cview.reverse_layout()};
+    using crevaccess = decltype(creversed(0, 0, 0));
     testing::check_true(std::is_same_v<crevaccess, const double&>);
     testing::check_false(std::is_assignable_v<crevaccess, double>);
 
@@ -372,8 +392,8 @@ void test_const_correctness_preservation() {
     testing::check_true(std::is_same_v<csubaccess, const double&>);
     testing::check_false(std::is_assignable_v<csubaccess, double>);
 
-    auto ctranspose{cview.transpose<0, 2>()};
-    using ctraccess = decltype(ctranspose(0, 0, 0));
+    auto ctransposed{cview.transpose<0, 2>()};
+    using ctraccess = decltype(ctransposed(0, 0, 0));
     testing::check_true(std::is_same_v<ctraccess, const double&>);
     testing::check_false(std::is_assignable_v<ctraccess, double>);
   }
@@ -382,6 +402,7 @@ void test_const_correctness_preservation() {
 void run_test_suite() {
   test_permute();
   test_slice();
+  test_compositions();
   test_const_correctness_preservation();
 }
 }  // namespace
