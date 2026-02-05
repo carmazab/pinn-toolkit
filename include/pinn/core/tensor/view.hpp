@@ -10,11 +10,11 @@
 
 namespace core {
 namespace tensor {
-template <class LayoutT, class DataT>
+template <class DataT, class LayoutT>
 struct View {
+  using data_t = DataT;
   using layout_t = LayoutT;
   using indexer_t = layout_t::indexer_t;
-  using data_t = DataT;
 
   static constexpr index_t rank = layout_t::rank;
 
@@ -44,7 +44,7 @@ struct View {
   template <index_t... AxisMap>
     requires AxisPermutation<AxisMap...> && (sizeof...(AxisMap) == rank)
   constexpr auto permute() const noexcept {
-    return View<reordered_layout<layout_t, AxisMap...>, data_t>{
+    return View<data_t, reordered_layout<layout_t, AxisMap...>>{
         data, indexer_t{extents[AxisMap]...}, indexer_t{strides[AxisMap]...}};
   }
 
@@ -82,7 +82,7 @@ struct View {
       }
     }
 
-    return View<sliced_layout_t, data_t>{data + index * strides[Dim],
+    return View<data_t, sliced_layout_t>{data + index * strides[Dim],
                                          subextents, substrides};
   }
 };
@@ -90,21 +90,21 @@ struct View {
 template <class LayoutT, class DataT>
 constexpr auto make_view(DataT* data,
                          const typename LayoutT::indexer_t& extents) noexcept {
-  return View<LayoutT, DataT>{data, extents,
+  return View<DataT, LayoutT>{data, extents,
                               LayoutT::strides_from_extents(extents)};
 }
 
 template <class LayoutT, class DataT>
 constexpr auto make_view(Buffer<DataT>& buffer,
                          const typename LayoutT::indexer_t& extents) noexcept {
-  return View<LayoutT, DataT>{buffer.data(), extents,
+  return View<DataT, LayoutT>{buffer.data(), extents,
                               LayoutT::strides_from_extents(extents)};
 }
 
 template <class LayoutT, class DataT>
 constexpr auto make_view(const Buffer<DataT>& buffer,
                          const typename LayoutT::indexer_t& extents) noexcept {
-  return View<LayoutT, const DataT>{buffer.data(), extents,
+  return View<const DataT, LayoutT>{buffer.data(), extents,
                                     LayoutT::strides_from_extents(extents)};
 }
 

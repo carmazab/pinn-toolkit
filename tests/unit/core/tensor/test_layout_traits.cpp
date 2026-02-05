@@ -27,12 +27,12 @@ void test_permute() {
   constexpr index_t rank{layout::rank};
   constexpr layout::indexer_t extents{ext_0, ext_1, ext_2, ext_3};
 
-  const core::tensor::View<layout, double> view{
+  const core::tensor::View<double, layout> view{
       core::tensor::make_view<layout>(buffer, extents)};
 
   {  // Check that identity permutation does not change layout.
     using expected_layout = layout;
-    const core::tensor::View<expected_layout, double> permuted{
+    const core::tensor::View<double, expected_layout> permuted{
         view.permute<0, 1, 2, 3>()};
 
     std::array<index_t, rank> map{0, 1, 2, 3};
@@ -59,7 +59,7 @@ void test_permute() {
 
   {  // Check reversed layout.
     using expected_layout = core::tensor::Layout<2, 0, 3, 1>;
-    const core::tensor::View<expected_layout, double> reversed{
+    const core::tensor::View<double, expected_layout> reversed{
         view.reverse_layout()};
 
     std::array<index_t, rank> map{3, 2, 1, 0};
@@ -86,7 +86,7 @@ void test_permute() {
 
   {  // Check transposition of two axes.
     using expected_layout = core::tensor::Layout<1, 2, 0, 3>;
-    const core::tensor::View<expected_layout, double> transposed{
+    const core::tensor::View<double, expected_layout> transposed{
         view.transpose<1, 3>()};
 
     std::array<index_t, rank> map{0, 3, 2, 1};
@@ -113,7 +113,7 @@ void test_permute() {
 
   {  // Check nontrivial permutation.
     using expected_layout = core::tensor::Layout<0, 2, 3, 1>;
-    const core::tensor::View<expected_layout, double> permuted{
+    const core::tensor::View<double, expected_layout> permuted{
         view.permute<2, 3, 1, 0>()};
 
     std::array<index_t, rank> map{2, 3, 1, 0};
@@ -140,7 +140,7 @@ void test_permute() {
 
   {  // Check another nontrivial permutation.
     using expected_layout = core::tensor::Layout<1, 0, 2, 3>;
-    const core::tensor::View<expected_layout, double> permuted{
+    const core::tensor::View<double, expected_layout> permuted{
         view.permute<0, 2, 3, 1>()};
 
     std::array<index_t, rank> map{0, 2, 3, 1};
@@ -184,14 +184,14 @@ void test_slice() {
   constexpr index_t rank{layout::rank};
   constexpr layout::indexer_t extents{ext_0, ext_1, ext_2, ext_3};
 
-  const core::tensor::View<layout, double> view{
+  const core::tensor::View<double, layout> view{
       core::tensor::make_view<layout>(buffer, extents)};
 
   {  // Check slicing along first axis.
     using expected_layout = core::tensor::Layout<2, 0, 1>;
 
     for (index_t slice_index{0}; slice_index < extents[0]; ++slice_index) {
-      const core::tensor::View<expected_layout, double> subview{
+      const core::tensor::View<double, expected_layout> subview{
           view.slice<0>(slice_index)};
 
       for (index_t j{0}; j < rank - 1; ++j) {
@@ -220,7 +220,7 @@ void test_slice() {
     using expected_layout = core::tensor::Layout<1, 0, 2>;
 
     for (index_t slice_index{0}; slice_index < extents[1]; ++slice_index) {
-      const core::tensor::View<expected_layout, double> subview{
+      const core::tensor::View<double, expected_layout> subview{
           view.slice<1>(slice_index)};
 
       for (index_t j{0}; j < rank - 1; ++j) {
@@ -249,7 +249,7 @@ void test_slice() {
     using expected_layout = core::tensor::Layout<0, 2, 1>;
 
     for (index_t slice_index{0}; slice_index < extents[2]; ++slice_index) {
-      const core::tensor::View<expected_layout, double> subview{
+      const core::tensor::View<double, expected_layout> subview{
           view.slice<2>(slice_index)};
 
       for (index_t j{0}; j < rank - 1; ++j) {
@@ -278,7 +278,7 @@ void test_slice() {
     using expected_layout = core::tensor::Layout<1, 2, 0>;
 
     for (index_t slice_index{0}; slice_index < extents[3]; ++slice_index) {
-      const core::tensor::View<expected_layout, double> subview{
+      const core::tensor::View<double, expected_layout> subview{
           view.slice<3>(slice_index)};
 
       for (index_t j{0}; j < rank - 1; ++j) {
@@ -316,7 +316,7 @@ void test_slice() {
 
     using expected_layout = core::tensor::Layout<>;
     const core::index_t index{rng.uniform_int<core::index_t>(0, extent - 1)};
-    const core::tensor::View<expected_layout, double> slice{
+    const core::tensor::View<double, expected_layout> slice{
         view_1d.slice<0>(index)};
     testing::check_equal_within(slice(), another_buffer[index]);
   }

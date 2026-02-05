@@ -40,7 +40,7 @@ void test_construction_and_indexing() {
   using layout = core::tensor::Layout<0, 1, 3, 2>;
   constexpr layout::indexer_t extents{ext_0, ext_1, ext_2, ext_3};
 
-  const core::tensor::View<layout, double> view{
+  const core::tensor::View<double, layout> view{
       core::tensor::make_view<layout>(buffer, extents)};
 
   for (index_t j0{0}; j0 < ext_0; ++j0) {
@@ -74,7 +74,7 @@ void test_const_correctness() {
   using layout = core::tensor::Layout<0, 1, 2>;
 
   {  // Check access of view constructed from raw pointer.
-    using writable = core::tensor::View<layout, double>;
+    using writable = core::tensor::View<double, layout>;
     using writable_access = decltype(std::declval<writable>()(0, 0, 0));
     testing::check_true(std::is_same_v<writable_access, double&>);
     testing::check_true(std::is_assignable_v<writable_access, double>);
@@ -84,7 +84,7 @@ void test_const_correctness() {
         std::is_assignable_v<decltype(std::declval<const writable>()(0, 0, 0)),
                              double>);
 
-    using readonly = core::tensor::View<layout, const double>;
+    using readonly = core::tensor::View<const double, layout>;
     using readonly_access = decltype(std::declval<readonly>()(0, 0, 0));
     testing::check_true(std::is_same_v<readonly_access, const double&>);
     testing::check_false(std::is_assignable_v<readonly_access, double>);
@@ -109,7 +109,7 @@ void test_const_correctness() {
 }
 
 void test_copy_and_move_semantics() {
-  using view = core::tensor::View<core::tensor::Layout<0>, double>;
+  using view = core::tensor::View<double, core::tensor::Layout<0>>;
   testing::check_true(std::is_copy_constructible_v<view>);
   testing::check_true(std::is_copy_assignable_v<view>);
   testing::check_true(std::is_move_constructible_v<view>);
@@ -118,7 +118,7 @@ void test_copy_and_move_semantics() {
 }
 
 void test_reference_semantics() {
-  using view = core::tensor::View<core::tensor::Layout<0, 1>, double>;
+  using view = core::tensor::View<double, core::tensor::Layout<0, 1>>;
   testing::check_true(
       std::is_reference_v<decltype(std::declval<view>()(0, 0))>);
   testing::check_true(
@@ -127,7 +127,7 @@ void test_reference_semantics() {
 
 void test_size_and_alignment() {
   using layout = core::tensor::Layout<0, 2, 1, 3>;
-  using view = core::tensor::View<layout, double>;
+  using view = core::tensor::View<double, layout>;
 
   constexpr std::size_t expected_size{sizeof(double*) +
                                       2 * sizeof(layout::indexer_t)};
@@ -137,7 +137,7 @@ void test_size_and_alignment() {
 }
 
 void test_noexcept_properties() {
-  using view = core::tensor::View<core::tensor::Layout<1, 0, 2>, double>;
+  using view = core::tensor::View<double, core::tensor::Layout<1, 0, 2>>;
   testing::check_true(noexcept(std::declval<view>()(0, 0, 0)));
   testing::check_true(std::is_nothrow_copy_constructible_v<view>);
   testing::check_true(std::is_nothrow_copy_assignable_v<view>);
@@ -146,7 +146,7 @@ void test_noexcept_properties() {
 }
 
 void test_additional_properties() {
-  using view = core::tensor::View<core::tensor::Layout<2, 0, 1, 3>, double>;
+  using view = core::tensor::View<double, core::tensor::Layout<2, 0, 1, 3>>;
   testing::check_true(std::is_standard_layout_v<view>);
   testing::check_true(std::is_aggregate_v<view>);
   testing::check_true(std::is_trivially_destructible_v<view>);
