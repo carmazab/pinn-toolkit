@@ -7,17 +7,17 @@ namespace {
 template <class LayoutT>
 void test_strides() {
   using layout_t = LayoutT;
-  using indexer_t = layout_t::indexer_t;
+  using shape_t = layout_t::shape_t;
 
-  constexpr indexer_t stride_order{layout_t::stride_order};
+  constexpr shape_t stride_order{layout_t::stride_order};
   constexpr core::index_t rank{layout_t::rank};
 
-  testing::check_equal(rank, indexer_t{}.size());
+  testing::check_equal(rank, shape_t{}.size());
 
   const auto extents = [&]() {
     constexpr core::index_t min{1}, max{10};
     core::random::RngState rng{testing::random_seed()};
-    indexer_t result{};
+    shape_t result{};
     for (core::index_t j{0}; j < rank; ++j) {
       result[j] = rng.uniform_int(min, max);
     }
@@ -27,7 +27,7 @@ void test_strides() {
   const auto strides{layout_t::strides_from_extents(extents)};
 
   const auto expected_strides = [&]() {
-    indexer_t result{};
+    shape_t result{};
     result[stride_order[0]] = 1;
     for (core::index_t j{0}; j < rank - 1; ++j) {
       result[stride_order[j + 1]] =

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <utility>
 
 #include "pinn/core/tensor/layout.hpp"
@@ -13,8 +12,8 @@ template <class T, T... Order, T... Map>
 consteval auto apply_axis_map(std::integer_sequence<T, Order...>,
                               std::integer_sequence<T, Map...>) {
   constexpr auto size{sizeof...(Order)};
-  constexpr std::array<T, size> order{Order...};
-  constexpr std::array<T, size> map{Map...};
+  constexpr indices_t<size> order{Order...};
+  constexpr indices_t<size> map{Map...};
   return [&]<index_t... Is>(std::integer_sequence<index_t, Is...>) {
     return std::integer_sequence<T, order[map[Is]]...>{};
   }(std::make_integer_sequence<index_t, size>{});
@@ -32,11 +31,11 @@ namespace layout_detail {
 template <class T, T Dim, T... Order>
 consteval auto sliced_order_as_array() {
   constexpr auto size{sizeof...(Order)};
-  std::array<T, size> order{Order...};
+  indices_t<size> order{Order...};
   T removed_stride{order[Dim]};
 
   index_t idx{0};
-  std::array<T, size - 1> result{};
+  indices_t<size - 1> result{};
   for (index_t j{0}; j < size; ++j) {
     if (j == Dim) {
       continue;

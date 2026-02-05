@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <concepts>
 #include <utility>
 
@@ -14,7 +13,7 @@ template <index_t... Elements>
 consteval bool is_axis_permutation_v() {
   constexpr auto size{sizeof...(Elements)};
 
-  std::array<index_t, size> elements{Elements...};
+  indices_t<size> elements{Elements...};
   std::sort(elements.begin(), elements.end());
   for (index_t j{0}; j < size; ++j) {
     if (elements[j] != j) {
@@ -32,24 +31,24 @@ concept AxisPermutation = layout_detail::is_axis_permutation_v<Elements...>();
 template <index_t... StrideOrder>
   requires AxisPermutation<StrideOrder...>
 struct Layout {
-  using indexer_t = std::array<index_t, sizeof...(StrideOrder)>;
+  using shape_t = indices_t<sizeof...(StrideOrder)>;
   using stride_order_t = std::integer_sequence<index_t, StrideOrder...>;
 
   static constexpr index_t rank = sizeof...(StrideOrder);
-  static constexpr indexer_t stride_order = {StrideOrder...};
+  static constexpr shape_t stride_order = {StrideOrder...};
 
   template <class... Extents>
     requires(sizeof...(Extents) == rank)
-  static constexpr indexer_t strides_from_extents(Extents... extents) noexcept {
-    return strides_from_extents(indexer_t{static_cast<index_t>(extents)...});
+  static constexpr shape_t strides_from_extents(Extents... extents) noexcept {
+    return strides_from_extents(shape_t{static_cast<index_t>(extents)...});
   }
 
-  static constexpr indexer_t strides_from_extents(indexer_t extents) noexcept {
+  static constexpr shape_t strides_from_extents(shape_t extents) noexcept {
     if constexpr (rank == 0) {
-      return indexer_t{};
+      return shape_t{};
     }
 
-    indexer_t result{};
+    shape_t result{};
     result[stride_order[0]] = 1;
     for (index_t j{0}; j < rank - 1; ++j) {
       result[stride_order[j + 1]] =

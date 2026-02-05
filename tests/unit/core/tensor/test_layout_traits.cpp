@@ -25,7 +25,7 @@ void test_permute() {
 
   using layout = core::tensor::Layout<1, 3, 0, 2>;
   constexpr index_t rank{layout::rank};
-  constexpr layout::indexer_t extents{ext_0, ext_1, ext_2, ext_3};
+  constexpr layout::shape_t extents{ext_0, ext_1, ext_2, ext_3};
 
   const core::tensor::View<double, layout> view{
       core::tensor::make_view<layout>(buffer, extents)};
@@ -35,7 +35,7 @@ void test_permute() {
     const core::tensor::View<double, expected_layout> permuted{
         view.permute<0, 1, 2, 3>()};
 
-    std::array<index_t, rank> map{0, 1, 2, 3};
+    layout::shape_t map{0, 1, 2, 3};
     for (index_t j{0}; j < rank; ++j) {
       testing::check_equal(permuted.extents[j], view.extents[map[j]]);
       testing::check_equal(permuted.strides[j], view.strides[map[j]]);
@@ -62,7 +62,7 @@ void test_permute() {
     const core::tensor::View<double, expected_layout> reversed{
         view.reverse_layout()};
 
-    std::array<index_t, rank> map{3, 2, 1, 0};
+    layout::shape_t map{3, 2, 1, 0};
     for (index_t j{0}; j < rank; ++j) {
       testing::check_equal(reversed.extents[j], view.extents[map[j]]);
       testing::check_equal(reversed.strides[j], view.strides[map[j]]);
@@ -89,7 +89,7 @@ void test_permute() {
     const core::tensor::View<double, expected_layout> transposed{
         view.transpose<1, 3>()};
 
-    std::array<index_t, rank> map{0, 3, 2, 1};
+    layout::shape_t map{0, 3, 2, 1};
     for (index_t j{0}; j < rank; ++j) {
       testing::check_equal(transposed.extents[j], view.extents[map[j]]);
       testing::check_equal(transposed.strides[j], view.strides[map[j]]);
@@ -116,7 +116,7 @@ void test_permute() {
     const core::tensor::View<double, expected_layout> permuted{
         view.permute<2, 3, 1, 0>()};
 
-    std::array<index_t, rank> map{2, 3, 1, 0};
+    layout::shape_t map{2, 3, 1, 0};
     for (index_t j{0}; j < rank; ++j) {
       testing::check_equal(permuted.extents[j], view.extents[map[j]]);
       testing::check_equal(permuted.strides[j], view.strides[map[j]]);
@@ -143,7 +143,7 @@ void test_permute() {
     const core::tensor::View<double, expected_layout> permuted{
         view.permute<0, 2, 3, 1>()};
 
-    std::array<index_t, rank> map{0, 2, 3, 1};
+    layout::shape_t map{0, 2, 3, 1};
     for (index_t j{0}; j < rank; ++j) {
       testing::check_equal(permuted.extents[j], view.extents[map[j]]);
       testing::check_equal(permuted.strides[j], view.strides[map[j]]);
@@ -182,7 +182,7 @@ void test_slice() {
 
   using layout = core::tensor::Layout<1, 3, 0, 2>;
   constexpr index_t rank{layout::rank};
-  constexpr layout::indexer_t extents{ext_0, ext_1, ext_2, ext_3};
+  constexpr layout::shape_t extents{ext_0, ext_1, ext_2, ext_3};
 
   const core::tensor::View<double, layout> view{
       core::tensor::make_view<layout>(buffer, extents)};
@@ -312,7 +312,7 @@ void test_slice() {
 
     using layout_1d = core::tensor::Layout<0>;
     const auto view_1d{core::tensor::make_view<layout_1d>(
-        another_buffer, layout_1d::indexer_t{extent})};
+        another_buffer, layout_1d::shape_t{extent})};
 
     using expected_layout = core::tensor::Layout<>;
     const core::index_t index{rng.uniform_int<core::index_t>(0, extent - 1)};
@@ -326,7 +326,7 @@ void test_compositions() {
   using layout = core::tensor::Layout<3, 4, 1, 0, 2>;
   core::index_t size{4};
   core::tensor::Buffer<double> buffer{size};
-  constexpr layout::indexer_t extents{1, 2, 1, 2, 1};
+  constexpr layout::shape_t extents{1, 2, 1, 2, 1};
   auto view{core::tensor::make_view<layout>(buffer, extents)};
 
   auto comp_1{view.slice<2>(0).transpose<3, 2>().reverse_layout()};
@@ -345,7 +345,7 @@ void test_compositions() {
 void test_const_correctness_preservation() {
   using layout = core::tensor::Layout<0, 2, 1>;
 
-  constexpr layout::indexer_t extents{2, 3, 4};
+  constexpr layout::shape_t extents{2, 3, 4};
   const core::index_t size{extents[0] * extents[1] * extents[2]};
 
   {  // Test correctness with mutable views.

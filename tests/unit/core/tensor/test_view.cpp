@@ -13,8 +13,8 @@
 namespace {
 template <class LayoutT>
 core::index_t expected_offset_from_extents(
-    const typename LayoutT::indexer_t& extents,
-    const typename LayoutT::indexer_t& index) {
+    const typename LayoutT::shape_t& extents,
+    const typename LayoutT::shape_t& index) {
   const auto strides{LayoutT::strides_from_extents(extents)};
   core::index_t result{0};
   for (core::index_t j{0}; j < extents.size(); ++j) {
@@ -38,7 +38,7 @@ void test_construction_and_indexing() {
   }
 
   using layout = core::tensor::Layout<0, 1, 3, 2>;
-  constexpr layout::indexer_t extents{ext_0, ext_1, ext_2, ext_3};
+  constexpr layout::shape_t extents{ext_0, ext_1, ext_2, ext_3};
 
   const core::tensor::View<double, layout> view{
       core::tensor::make_view<layout>(buffer, extents)};
@@ -48,7 +48,7 @@ void test_construction_and_indexing() {
       for (index_t j2{0}; j2 < ext_2; ++j2) {
         for (index_t j3{0}; j3 < ext_3; ++j3) {
           const auto offset{expected_offset_from_extents<layout>(
-              extents, layout::indexer_t{j0, j1, j2, j3})};
+              extents, layout::shape_t{j0, j1, j2, j3})};
           testing::check_equal_within(view(j0, j1, j2, j3), buffer[offset]);
 
           const double new_value{rng.normal(mean, stddev)};
@@ -91,7 +91,7 @@ void test_const_correctness() {
   }
 
   {  // Check access of view constructed from buffer.
-    constexpr layout::indexer_t extents{2, 3, 4};
+    constexpr layout::shape_t extents{2, 3, 4};
     const core::index_t size{extents[0] * extents[1] * extents[2]};
 
     core::tensor::Buffer<double> buffer{size};
@@ -130,7 +130,7 @@ void test_size_and_alignment() {
   using view = core::tensor::View<double, layout>;
 
   constexpr std::size_t expected_size{sizeof(double*) +
-                                      2 * sizeof(layout::indexer_t)};
+                                      2 * sizeof(layout::shape_t)};
 
   testing::check_equal(sizeof(view), expected_size);
   testing::check_true(alignof(view) >= alignof(double*));
