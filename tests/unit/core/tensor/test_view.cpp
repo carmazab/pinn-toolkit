@@ -8,6 +8,7 @@
 #include "pinn/core/tensor/view.hpp"
 #include "pinn/core/types.hpp"
 #include "testing/check_equal.hpp"
+#include "testing/check_exception.hpp"
 #include "testing/random_seed.hpp"
 
 namespace {
@@ -68,6 +69,15 @@ void test_construction_and_indexing() {
   auto another_scalar{core::tensor::make_view<double>(buffer)};
   scalar() = rng.normal(mean, stddev);
   testing::check_equal_within(another_scalar(), scalar());
+}
+
+void test_zero_extent() {
+  using layout = core::tensor::Layout<0, 1, 2>;
+
+  double buffer[1]{};
+  testing::check_throws_as_logic_error([&]() {
+    core::tensor::make_view<layout>(buffer, layout::shape_t{3, 0, 5});
+  });
 }
 
 void test_const_correctness() {
@@ -154,6 +164,7 @@ void test_additional_properties() {
 
 void run_test_suite() {
   test_construction_and_indexing();
+  test_zero_extent();
   test_const_correctness();
   test_copy_and_move_semantics();
   test_reference_semantics();

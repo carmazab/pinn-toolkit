@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <utility>
 
 #include "pinn/core/assert.hpp"
@@ -87,23 +88,41 @@ struct View {
   }
 };
 
+namespace detail {
+struct view_error : std::logic_error {
+  using std::logic_error::logic_error;
+};
+
+template <class Extents>
+void validate_extents(const Extents& extents) {
+  for (const auto e : extents) {
+    if (e == 0) {
+      throw view_error("view extents must be strictly positive");
+    }
+  }
+}
+}  // namespace detail
+
 template <class LayoutT, class DataT>
 constexpr auto make_view(DataT* data,
-                         const typename LayoutT::shape_t& extents) noexcept {
+                         const typename LayoutT::shape_t& extents) {
+  detail::validate_extents(extents);
   return View<DataT, LayoutT>{data, extents,
                               LayoutT::strides_from_extents(extents)};
 }
 
 template <class LayoutT, class DataT>
 constexpr auto make_view(Buffer<DataT>& buffer,
-                         const typename LayoutT::shape_t& extents) noexcept {
+                         const typename LayoutT::shape_t& extents) {
+  detail::validate_extents(extents);
   return View<DataT, LayoutT>{buffer.data(), extents,
                               LayoutT::strides_from_extents(extents)};
 }
 
 template <class LayoutT, class DataT>
 constexpr auto make_view(const Buffer<DataT>& buffer,
-                         const typename LayoutT::shape_t& extents) noexcept {
+                         const typename LayoutT::shape_t& extents) {
+  detail::validate_extents(extents);
   return View<const DataT, LayoutT>{buffer.data(), extents,
                                     LayoutT::strides_from_extents(extents)};
 }
