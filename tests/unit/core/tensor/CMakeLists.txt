@@ -2,6 +2,7 @@ add_unit_test_executable(
   test_core_tensor
   SOURCES
   test_buffer.cpp
+  test_expressions_broadcast.cpp
   test_layout.cpp
   test_layout_traits.cpp
   test_view.cpp
